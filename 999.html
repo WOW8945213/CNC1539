@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<title>本息平均攤還試算</title>
+<style>
+*{box-sizing:border-box;font-family: "Microsoft JhengHei",sans-serif;}
+body{padding:20px;background:#fff;}
+.wrap{max-width:1050px;margin:0 auto;border:1px solid #337ab7;}
+.title-bar{background:#2767ad;color:#fff;padding:10px;text-align:center;font-size:22px;font-weight:bold;}
+.input-area{background:#e8f2ff;padding:12px;}
+.input-row{display:grid;grid-template-columns:180px 220px;gap:8px;margin:6px 0;align-items:center;}
+.input-row label{padding:4px;}
+.input-row input{padding:4px;font-size:16px;}
+.btn-group{text-align:center;margin:10px 0;}
+button{padding:6px 16px;font-size:16px;margin:0 4px;cursor:pointer;}
+.result-summary{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;margin:10px 0;gap:8px;}
+.sum-card{border:1px solid #ccc;padding:10px;text-align:center;}
+.sum-card .big-red{font-size:20px;color:red;font-weight:bold;}
+table{width:100%;border-collapse:collapse;margin-top:10px;}
+th{background:#2767ad;color:#fff;padding:8px;text-align:center;}
+td{border:1px solid #ccc;padding:7px;text-align:right;}
+.omit-row td{text-align:center;color:#333;background:#f4f8ff;}
+#resultBlock{padding:10px;}
+
+/* ========== 列印專用CSS ========== */
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    #resultBlock, #resultBlock * {
+        visibility: visible;
+    }
+    #resultBlock {
+        position: absolute;
+        left:0;
+        top:0;
+        width:100%;
+        border:none;
+    }
+    .btn-group, button {
+        display: none !important;
+    }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="title-bar">本息平均攤還試算</div>
+  <div class="input-area">
+    <div class="input-row">
+      <label>您的貸款金額是：</label>
+      <input type="number" id="principal" value="2000000">元
+    </div>
+    <div class="input-row">
+      <label>貸款年數：</label>
+      <input type="number" id="loanYear" value="10">年
+    </div>
+    <div class="input-row">
+      <label>貸款起始(民國)年月是：</label>
+      <input type="number" id="rocYear" value="115">年
+      <input type="number" id="rocMonth" value="1">月
+    </div>
+    <div class="input-row">
+      <label>年利率：</label>
+      <input type="number" step="0.01" id="annualRate" value="3">%
+    </div>
+    <div class="btn-group">
+      <button onclick="calc()">試算</button>
+      <button onclick="clearAll()">取消</button>
+      <button onclick="printResult()">列印</button>
+    </div>
+  </div>
+
+  <div id="resultBlock" style="display:none;">
+    <h3>試算結果</h3>
+    <div class="result-summary">
+      <div class="sum-card">
+        <div>每月應繳金額</div>
+        <div class="big-red" id="monthPayText"></div>
+      </div>
+      <div class="sum-card">
+        <div>貸款本金</div>
+        <div class="big-red" id="priText"></div>
+      </div>
+      <div class="sum-card">
+        <div>總繳款金額</div>
+        <div class="big-red" id="totalPayText"></div>
+      </div>
+      <div class="sum-card">
+        <div>總利息金額</div>
+        <div class="big-red" id="totalIntText"></div>
+      </div>
+    </div>
+    <div style="margin-top:12px;">
+      <h4>還款明細表（僅顯示前8期與後8期，中間期數省略）</h4>
+      <table>
+        <thead>
+          <tr>
+            <th>期數</th>
+            <th>繳款日期</th>
+            <th>每月應繳</th>
+            <th>本金</th>
+            <th>利息</th>
+            <th>剩餘本金</th>
+          </tr>
+        </thead>
+        <tbody id="scheduleBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+function calc(){
+  const P = Number(document.getElementById('principal').value);
+  const year = Number(document.getElementById('loanYear').value);
+  const apr = Number(document.getElementById('annualRate').value);
+  const rocY = Number(document.getElementById('rocYear').value);
+  const rocM = Number(document.getElementById('rocMonth').value);
+
+  if(!P||!year||!apr||!rocY||!rocM){
+    alert("請填寫完整欄位");
+    return;
+  }
+
+  const i = apr / 100 / 12;
+  const n = year * 12;
+  let payRate;
+  if(Math.abs(i)<1e-12){
+    payRate = 1 / n;
+  }else{
+    payRate = ( Math.pow(1+i,n) * i ) / ( Math.pow(1+i,n) - 1 );
+  }
+  const monthPay = P * payRate;
+
+  let balance = P;
+  let totalInterest = 0;
+  const rows = [];
+  let cy = rocY;
+  let cm = rocM;
+
+  for(let k=1;k<=n;k++){
+    let intMonth = balance * i;
+    let priMonth = monthPay - intMonth;
+    if(k === n){
+      priMonth = balance;
+      intMonth = monthPay - priMonth;
+    }
+    balance = balance - priMonth;
+    totalInterest += intMonth;
+
+    //民國日期
+    let dateStr = `${cy}/${String(cm).padStart(2,'0')}`;
+    rows.push({
+      period:k,
+      date:dateStr,
+      monthPay:monthPay,
+      pri:priMonth,
+      int:intMonth,
+      bal:balance
+    })
+    cm++;
+    if(cm>12){
+      cm=1;
+      cy++;
+    }
+  }
+
+  //填入摘要
+  document.getElementById('monthPayText').innerText = Math.round(monthPay).toLocaleString() + ' 元';
+  document.getElementById('priText').innerText = P.toLocaleString() + ' 元';
+  document.getElementById('totalPayText').innerText = Math.round(P + totalInterest).toLocaleString() + ' 元';
+  document.getElementById('totalIntText').innerText = Math.round(totalInterest).toLocaleString() + ' 元';
+
+  //組表格：前8筆 + 省略列 + 最後8筆
+  const tbody = document.getElementById('scheduleBody');
+  tbody.innerHTML = "";
+  const showFront = rows.slice(0,8);
+  const showBack = rows.slice(-8);
+  showFront.forEach(r=> addRow(tbody,r));
+
+  //省略列
+  const omitTr = document.createElement('tr');
+  omitTr.className = "omit-row";
+  omitTr.innerHTML = `<td colspan="6">……中間期數省略……</td>`;
+  tbody.appendChild(omitTr);
+
+  showBack.forEach(r=> addRow(tbody,r));
+  document.getElementById('resultBlock').style.display = "block";
+}
+
+function addRow(tbody,r){
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td>${r.period}</td>
+    <td>${r.date}</td>
+    <td>${Math.round(r.monthPay).toLocaleString()}</td>
+    <td>${Math.round(r.pri).toLocaleString()}</td>
+    <td>${Math.round(r.int).toLocaleString()}</td>
+    <td>${Math.round(r.bal).toLocaleString()}</td>
+  `;
+  tbody.appendChild(tr);
+}
+
+function clearAll(){
+  document.getElementById('principal').value='';
+  document.getElementById('loanYear').value='';
+  document.getElementById('rocYear').value='';
+  document.getElementById('rocMonth').value='';
+  document.getElementById('annualRate').value='';
+  document.getElementById('resultBlock').style.display="none";
+}
+
+// 列印功能
+function printResult(){
+  if(document.getElementById('resultBlock').style.display === "none"){
+    alert("請先執行試算，才能列印！");
+    return;
+  }
+  window.print();
+}
+</script>
+</body>
+</html>
