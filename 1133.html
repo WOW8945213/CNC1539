@@ -32,6 +32,8 @@ td{border:1px solid #ccc;padding:5px;text-align:center;font-size:13px;}
 #resultBlock{padding:8px;}
 h3{font-size:16px;margin:6px 0;}
 h4{font-size:14px;margin:6px 0;}
+.block-line{margin:12px 0;border-top:1px solid #999;}
+.batch-item{border:1px solid #ccc;padding:10px;margin:8px 0;}
 
 /* ========== 列印專用CSS ========== */
 @media print {
@@ -58,6 +60,7 @@ h4{font-size:14px;margin:6px 0;}
 <div class="wrap">
   <div class="title-bar">本息平均攤還試算</div>
   <div class="input-area">
+    <h4>【單筆試算】</h4>
     <div class="input-row">
       <label>您的貸款金額是：</label>
       <input type="number" id="principal" value="">
@@ -83,66 +86,47 @@ h4{font-size:14px;margin:6px 0;}
       <span class="unit">%</span>
     </div>
     <div class="btn-group">
-      <button onclick="calc()">試算</button>
-      <button onclick="clearAll()">清除</button>
+      <button onclick="calc()">單筆試算</button>
+    </div>
+
+    <div class="block-line"></div>
+    <h4>【區間批量試算】</h4>
+    <div class="input-row">
+      <label>起始貸款金額：</label>
+      <input type="number" id="startPri" value="">
+      <span class="unit">元</span>
+    </div>
+    <div class="input-row">
+      <label>結束貸款金額：</label>
+      <input type="number" id="endPri" value="">
+      <span class="unit">元</span>
+    </div>
+    <div class="input-row">
+      <label>貸款年數：</label>
+      <input type="number" id="batchLoanYear" value="">
+      <span class="unit">年</span>
+    </div>
+    <div class="input-row">
+      <label>年利率：</label>
+      <input type="number" step="0.01" id="batchRate" value="">
+      <span class="unit">%</span>
+    </div>
+    <div class="btn-group">
+      <button onclick="batchCalc()">多筆金額批量試算</button>
+      <button onclick="clearAll()">全部清除</button>
       <button onclick="printResult()">列印</button>
     </div>
   </div>
 
   <div id="resultBlock" style="display:none;">
-    <h3>單筆試算結果</h3>
-    <div style="margin-top:8px;">
-      <h4>還款明細表（僅顯示前8期與後8期，中間期數省略）</h4>
-      <table>
-        <thead>
-          <tr>
-            <th>期數</th>
-            <th>繳款日期</th>
-            <th>每月應繳</th>
-            <th>本金</th>
-            <th>利息</th>
-            <th>剩餘本金</th>
-          </tr>
-        </thead>
-        <tbody id="scheduleBody"></tbody>
-      </table>
-    </div>
-    <!-- 摘要卡片順序：每月應繳金額 → 貸款本金 → 總利息金額 → 總繳款金額 -->
-    <div class="result-summary" style="margin-top:10px;">
-      <div class="sum-card">
-        <div>每月應繳金額</div>
-        <div class="big-red" id="monthPayText"></div>
-      </div>
-      <div class="sum-card">
-        <div>貸款本金</div>
-        <div class="big-red" id="priText"></div>
-      </div>
-      <div class="sum-card">
-        <div>總利息金額</div>
-        <div class="big-red" id="totalIntText"></div>
-      </div>
-      <div class="sum-card">
-        <div>總繳款金額</div>
-        <div class="big-red" id="totalPayText"></div>
-      </div>
-    </div>
+    <h3>試算結果</h3>
+    <div id="resultContent"></div>
   </div>
 </div>
 
 <script>
-// 單筆試算
-function calc(){
-  const P = Number(document.getElementById('principal').value);
-  const year = Number(document.getElementById('loanYear').value);
-  const apr = Number(document.getElementById('annualRate').value);
-  const rocY = Number(document.getElementById('rocYear').value);
-  const rocM = Number(document.getElementById('rocMonth').value);
-
-  if(!P||!year||!apr||!rocY||!rocM){
-    alert("請填寫完整欄位");
-    return;
-  }
-
+// 共用試算函式
+function calcOne(P,year,apr,rocY,rocM){
   const i = apr / 100 / 12;
   const n = year * 12;
   let payRate;
@@ -152,13 +136,11 @@ function calc(){
     payRate = ( Math.pow(1+i,n) * i ) / ( Math.pow(1+i,n) - 1 );
   }
   const monthPay = P * payRate;
-
   let balance = P;
   let totalInterest = 0;
   const rows = [];
   let cy = rocY;
   let cm = rocM;
-
   for(let k=1;k<=n;k++){
     let intMonth = balance * i;
     let priMonth = monthPay - intMonth;
@@ -168,8 +150,6 @@ function calc(){
     }
     balance = balance - priMonth;
     totalInterest += intMonth;
-
-    //民國日期
     let dateStr = `${cy}/${String(cm).padStart(2,'0')}`;
     rows.push({
       period:k,
@@ -185,41 +165,137 @@ function calc(){
       cy++;
     }
   }
-
-  //填入摘要
-  document.getElementById('monthPayText').innerText = Math.round(monthPay).toLocaleString() + ' 元';
-  document.getElementById('priText').innerText = P.toLocaleString() + ' 元';
-  document.getElementById('totalPayText').innerText = Math.round(P + totalInterest).toLocaleString() + ' 元';
-  document.getElementById('totalIntText').innerText = Math.round(totalInterest).toLocaleString() + ' 元';
-
-  //組表格：前8筆 + 省略列 + 最後8筆
-  const tbody = document.getElementById('scheduleBody');
-  tbody.innerHTML = "";
-  const showFront = rows.slice(0,8);
-  const showBack = rows.slice(-8);
-  showFront.forEach(r=> addRow(tbody,r));
-
-  //省略列
-  const omitTr = document.createElement('tr');
-  omitTr.className = "omit-row";
-  omitTr.innerHTML = `<td colspan="6">……中間期數省略……</td>`;
-  tbody.appendChild(omitTr);
-
-  showBack.forEach(r=> addRow(tbody,r));
-  document.getElementById('resultBlock').style.display = "block";
+  return {
+    monthPay,
+    totalInterest,
+    totalPay:P+totalInterest,
+    principal:P,
+    rows
+  }
 }
 
-function addRow(tbody,r){
-  const tr = document.createElement('tr');
-  tr.innerHTML = `
-    <td>${r.period}</td>
-    <td>${r.date}</td>
-    <td>${Math.round(r.monthPay).toLocaleString()}</td>
-    <td>${Math.round(r.pri).toLocaleString()}</td>
-    <td>${Math.round(r.int).toLocaleString()}</td>
-    <td>${Math.round(r.bal).toLocaleString()}</td>
-  `;
-  tbody.appendChild(tr);
+// 單筆試算
+function calc(){
+  const P = Number(document.getElementById('principal').value);
+  const year = Number(document.getElementById('loanYear').value);
+  const apr = Number(document.getElementById('annualRate').value);
+  const rocY = Number(document.getElementById('rocYear').value);
+  const rocM = Number(document.getElementById('rocMonth').value);
+  if(!P||!year||!apr||!rocY||!rocM){
+    alert("請填寫完整單筆欄位");
+    return;
+  }
+  const res = calcOne(P,year,apr,rocY,rocM);
+  const html = buildSingleHtml(res);
+  document.getElementById('resultContent').innerHTML = html;
+  document.getElementById('resultBlock').style.display="block";
+}
+
+// 組單筆結果HTML
+function buildSingleHtml(res){
+  let tableHtml = `<h4>還款明細表（僅顯示前8期與後8期，中間期數省略）</h4>
+  <table>
+  <thead>
+    <tr>
+      <th>期數</th>
+      <th>繳款日期</th>
+      <th>每月應繳</th>
+      <th>本金</th>
+      <th>利息</th>
+      <th>剩餘本金</th>
+    </tr>
+  </thead><tbody>`;
+  const showFront = res.rows.slice(0,8);
+  const showBack = res.rows.slice(-8);
+  showFront.forEach(r=>{
+    tableHtml += `<tr>
+      <td>${r.period}</td>
+      <td>${r.date}</td>
+      <td>${Math.round(r.monthPay).toLocaleString()}</td>
+      <td>${Math.round(r.pri).toLocaleString()}</td>
+      <td>${Math.round(r.int).toLocaleString()}</td>
+      <td>${Math.round(r.bal).toLocaleString()}</td>
+    </tr>`;
+  })
+  tableHtml += `<tr class="omit-row"><td colspan="6">……中間期數省略……</td></tr>`;
+  showBack.forEach(r=>{
+    tableHtml += `<tr>
+      <td>${r.period}</td>
+      <td>${r.date}</td>
+      <td>${Math.round(r.monthPay).toLocaleString()}</td>
+      <td>${Math.round(r.pri).toLocaleString()}</td>
+      <td>${Math.round(r.int).toLocaleString()}</td>
+      <td>${Math.round(r.bal).toLocaleString()}</td>
+    </tr>`;
+  })
+  tableHtml += `</tbody></table>`;
+
+  const cardHtml = `
+  <div class="result-summary" style="margin-top:10px;">
+      <div class="sum-card">
+        <div>每月應繳金額</div>
+        <div class="big-red">${Math.round(res.monthPay).toLocaleString()} 元</div>
+      </div>
+      <div class="sum-card">
+        <div>貸款本金</div>
+        <div class="big-red">${res.principal.toLocaleString()} 元</div>
+      </div>
+      <div class="sum-card">
+        <div>總利息金額</div>
+        <div class="big-red">${Math.round(res.totalInterest).toLocaleString()} 元</div>
+      </div>
+      <div class="sum-card">
+        <div>總繳款金額</div>
+        <div class="big-red">${Math.round(res.totalPay).toLocaleString()} 元</div>
+      </div>
+    </div>`;
+  return tableHtml + cardHtml;
+}
+
+// 區間批量試算
+function batchCalc(){
+  const startPri = Number(document.getElementById('startPri').value);
+  const endPri = Number(document.getElementById('endPri').value);
+  const year = Number(document.getElementById('batchLoanYear').value);
+  const apr = Number(document.getElementById('batchRate').value);
+  const stepPri = 100000; //固定每次+10萬
+  if(!startPri||!endPri||!year||!apr){
+    alert("請填寫完整區間欄位");
+    return;
+  }
+  if(startPri>endPri){
+    alert("起始金額不可大於結束金額");
+    return;
+  }
+  let html = "";
+  //批量跑，起始年月預設民國114年1月，批量不需要逐筆日期表，只顯示卡片
+  let rocY=114,rocM=1;
+  for(let p=startPri;p<=endPri;p+=stepPri){
+    const res = calcOne(p,year,apr,rocY,rocM);
+    html += `<div class="batch-item">
+    <h4>貸款本金：${p.toLocaleString()} 元</h4>
+    <div class="result-summary">
+      <div class="sum-card">
+        <div>每月應繳金額</div>
+        <div class="big-red">${Math.round(res.monthPay).toLocaleString()} 元</div>
+      </div>
+      <div class="sum-card">
+        <div>貸款本金</div>
+        <div class="big-red">${res.principal.toLocaleString()} 元</div>
+      </div>
+      <div class="sum-card">
+        <div>總利息金額</div>
+        <div class="big-red">${Math.round(res.totalInterest).toLocaleString()} 元</div>
+      </div>
+      <div class="sum-card">
+        <div>總繳款金額</div>
+        <div class="big-red">${Math.round(res.totalPay).toLocaleString()} 元</div>
+      </div>
+    </div>
+    </div>`;
+  }
+  document.getElementById('resultContent').innerHTML = html;
+  document.getElementById('resultBlock').style.display="block";
 }
 
 // 清除全部欄位與結果
@@ -229,6 +305,10 @@ function clearAll(){
   document.getElementById('rocYear').value='';
   document.getElementById('rocMonth').value='';
   document.getElementById('annualRate').value='';
+  document.getElementById('startPri').value='';
+  document.getElementById('endPri').value='';
+  document.getElementById('batchLoanYear').value='';
+  document.getElementById('batchRate').value='';
   document.getElementById('resultBlock').style.display="none";
 }
 
