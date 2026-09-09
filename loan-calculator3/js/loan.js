@@ -21,7 +21,9 @@ function resetForm(){
 function calculate(){
 
 
-    let P =
+    // 基本資料
+
+    let principal =
     Number(document.getElementById("money").value);
 
 
@@ -32,7 +34,8 @@ function calculate(){
 
 
     let annualRate =
-    Number(document.getElementById("rate").value) / 100;
+    Number(document.getElementById("rate").value)
+    /100;
 
 
 
@@ -46,14 +49,17 @@ function calculate(){
 
 
 
+
     // 本息平均攤還公式
 
     let payment =
-    P *
+    principal *
     monthRate *
-    Math.pow(1 + monthRate, months)
+    Math.pow(1+monthRate,months)
     /
-    (Math.pow(1 + monthRate, months)-1);
+    (Math.pow(1+monthRate,months)-1);
+
+
 
 
 
@@ -63,15 +69,26 @@ function calculate(){
 
 
     let totalInterest =
-    totalPayment - P;
+    totalPayment - principal;
 
 
 
 
 
-    // 顯示摘要
 
-    document.getElementById("summary").innerHTML = `
+
+    // 顯示結果卡
+
+
+    document.getElementById("result").innerHTML = `
+
+
+    <div class="result-title">
+
+    ${years} 年貸款試算結果
+
+    </div>
+
 
 
     <div class="summary">
@@ -83,8 +100,9 @@ function calculate(){
             貸款本金
             </div>
 
-            <div class="money">
-            ${moneyFormat(P)} 元
+            <div class="card-value">
+            ${moneyFormat(principal)}
+            元
             </div>
 
         </div>
@@ -97,8 +115,9 @@ function calculate(){
             每月應繳金額
             </div>
 
-            <div class="money">
-            ${moneyFormat(payment)} 元
+            <div class="card-value">
+            ${moneyFormat(payment)}
+            元
             </div>
 
         </div>
@@ -111,8 +130,9 @@ function calculate(){
             總利息金額
             </div>
 
-            <div class="money">
-            ${moneyFormat(totalInterest)} 元
+            <div class="card-value">
+            ${moneyFormat(totalInterest)}
+            元
             </div>
 
         </div>
@@ -125,8 +145,9 @@ function calculate(){
             總繳款金額
             </div>
 
-            <div class="money">
-            ${moneyFormat(totalPayment)} 元
+            <div class="card-value">
+            ${moneyFormat(totalPayment)}
+            元
             </div>
 
         </div>
@@ -135,16 +156,20 @@ function calculate(){
 
     </div>
 
+
     `;
 
 
 
 
 
-    // 建立還款資料
 
 
-    let remain = P;
+    // 產生還款明細
+
+
+    let remain = principal;
+
 
 
     let startYear =
@@ -161,7 +186,10 @@ function calculate(){
 
 
 
+
+
     for(let i=1;i<=months;i++){
+
 
 
         let interest =
@@ -169,20 +197,21 @@ function calculate(){
 
 
 
-        let principal =
+        let principalPart =
         payment - interest;
 
 
 
-        remain -= principal;
+        remain -= principalPart;
 
 
 
         if(remain < 0){
 
-            remain = 0;
+            remain=0;
 
         }
+
 
 
 
@@ -202,13 +231,11 @@ function calculate(){
             period:i,
 
             date:
-            y + "/" +
-            String(m).padStart(2,"0"),
-
+            y+"/"+String(m).padStart(2,"0"),
 
             payment:payment,
 
-            principal:principal,
+            principal:principalPart,
 
             interest:interest,
 
@@ -227,15 +254,13 @@ function calculate(){
     // 前8期 + 後8期
 
 
-    let show=[];
+    let show;
 
 
 
-    if(months <= 16){
-
+    if(months <=16){
 
         show=data;
-
 
     }else{
 
@@ -257,27 +282,30 @@ function calculate(){
 
 
 
-    let html = `
 
 
-    <tr>
-
-    <th>期數</th>
-
-    <th>繳款日期</th>
-
-    <th>每月應繳</th>
-
-    <th>本金</th>
-
-    <th>利息</th>
-
-    <th>剩餘本金</th>
-
-    </tr>
+    let table=`
 
 
-    `;
+<tr>
+
+<th>期數</th>
+
+<th>繳款日期</th>
+
+<th>每月應繳</th>
+
+<th>本金</th>
+
+<th>利息</th>
+
+<th>剩餘本金</th>
+
+</tr>
+
+
+`;
+
 
 
 
@@ -290,71 +318,70 @@ function calculate(){
         if(item==="more"){
 
 
-            html += `
+            table += `
 
 
-            <tr class="more">
+<tr class="more">
 
-            <td colspan="6">
+<td colspan="6">
 
-            ...... 中間期數省略 ......
+...... 中間期數省略 ......
 
-            </td>
+</td>
 
-            </tr>
+</tr>
 
 
-            `;
-
+`;
 
             return;
-
 
         }
 
 
 
 
-        html += `
+
+        table += `
 
 
-        <tr>
+<tr>
+
+<td>
+${item.period}
+</td>
 
 
-        <td>
-        ${item.period}
-        </td>
+<td>
+${item.date}
+</td>
 
 
-        <td>
-        ${item.date}
-        </td>
+<td>
+${moneyFormat(item.payment)}
+</td>
 
 
-        <td>
-        ${moneyFormat(item.payment)}
-        </td>
+<td>
+${moneyFormat(item.principal)}
+</td>
 
 
-        <td>
-        ${moneyFormat(item.principal)}
-        </td>
+<td>
+${moneyFormat(item.interest)}
+</td>
 
 
-        <td>
-        ${moneyFormat(item.interest)}
-        </td>
+<td>
+${moneyFormat(item.remain)}
+</td>
 
 
-        <td>
-        ${moneyFormat(item.remain)}
-        </td>
+</tr>
 
 
-        </tr>
+`;
 
-
-        `;
 
 
     });
@@ -362,7 +389,10 @@ function calculate(){
 
 
 
-    document.getElementById("table").innerHTML = html;
+
+
+    document.getElementById("table").innerHTML =
+    table;
 
 
 
