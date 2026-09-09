@@ -6,7 +6,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>貸款方案試算比較</title>
+<title>貸款試算表</title>
 
 <link rel="stylesheet" href="css/style.css">
 
@@ -16,143 +16,159 @@
 <body>
 
 
-<div class="page">
+<div class="container">
 
 
-<!-- 標題 -->
-
-<header>
-
-<h1>
-貸款方案試算比較
-</h1>
-
-</header>
+<div class="title">
+貸款試算表
+</div>
 
 
 
 
 <!-- 輸入區 -->
 
-<section class="input-box">
+<div class="input-box">
 
 
-<div class="input-item">
+<div class="row">
 
-<label>
-貸款金額
-</label>
+<div class="label">
+貸款本金
+</div>
+
+<div class="input">
 
 <input id="money" value="2000000">
 
-<span>元</span>
+元
+
+</div>
 
 </div>
 
 
 
-<div class="input-item">
+<div class="row">
 
-<label>
-貸款起始
-</label>
+<div class="label">
+貸款年數
+</div>
 
-<input id="year" value="115">
+<div class="input">
 
-<span>年</span>
+<input id="year" value="3">
 
+年
 
-<input id="month" value="1">
-
-<span>月</span>
+</div>
 
 </div>
 
 
 
-<div class="input-item">
+<div class="row">
 
-<label>
+<div class="label">
+貸款起始年月
+</div>
+
+<div class="input">
+
+<input id="syear" value="115">
+
+年
+
+<input id="smonth" value="1">
+
+月
+
+</div>
+
+</div>
+
+
+
+
+<div class="row">
+
+<div class="label">
 年利率
-</label>
+</div>
+
+<div class="input">
 
 <input id="rate" value="3.3">
 
-<span>%</span>
+%
+
+</div>
 
 </div>
 
 
+
+<div class="button-area">
 
 <button onclick="calculate()">
 開始試算
 </button>
 
 
-</section>
-
-
-
-
-
-<!-- 基本資訊 -->
-
-<div id="info"></div>
-
-
-
-
-
-<!-- 方案卡片 -->
-
-<h2>
-貸款方案比較
-</h2>
-
-
-<div id="plans" class="plans"></div>
-
-
-
-
-
-<!-- 總覽 -->
-
-<h2>
-方案總覽
-</h2>
-
-
-<table id="summary-table"></table>
-
-
-
-
-
-<!-- 備註 -->
-
-<div class="note">
-
-
-<h2>
-計算說明
-</h2>
-
-
-<p>
-計算方式：本息平均攤還
-</p>
-
-<p>
-每月利息 = 剩餘本金 × 月利率
-</p>
-
-<p>
-每月本金 = 每月應繳金額 - 當期利息
-</p>
+<button onclick="resetForm()">
+清除
+</button>
 
 
 </div>
+
+
+</div>
+
+
+
+
+
+
+<!-- 結果 -->
+
+<div id="result" class="result">
+
+
+</div>
+
+
+
+
+
+
+<!-- 明細 -->
+
+
+<div class="table-box">
+
+
+<h2>
+還款明細表
+</h2>
+
+
+<div class="note">
+
+※ 顯示前8期與後8期，中間期數省略
+
+</div>
+
+
+
+<table id="table">
+
+</table>
+
+
+</div>
+
+
 
 
 
