@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>本息平均攤還試算</title>
+
+<link rel="stylesheet" href="css/style.css">
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+<div class="title">
+本息平均攤還試算
+</div>
+
+
+
+<div class="form-box">
+
+
+<div class="row">
+
+<div class="label">
+您的貸款金額是：
+</div>
+
+<div class="input">
+<input id="money" value="2000000">
+元
+</div>
+
+</div>
+
+
+
+<div class="row">
+
+<div class="label">
+貸款年數：
+</div>
+
+<div class="input">
+<input id="year" value="10">
+年
+</div>
+
+</div>
+
+
+
+<div class="row">
+
+<div class="label">
+貸款起始(民國)年月是：
+</div>
+
+<div class="input">
+
+<input id="syear" value="115">
+
+年
+
+<input id="smonth" value="1">
+
+月
+
+</div>
+
+</div>
+
+
+
+
+<div class="row">
+
+<div class="label">
+年利率：
+</div>
+
+<div class="input">
+
+<input id="rate" value="3">
+
+%
+
+</div>
+
+</div>
+
+
+
+<div class="button-area">
+
+<button onclick="calculate()">
+試算
+</button>
+
+
+<button onclick="resetForm()">
+取消
+</button>
+
+
+</div>
+
+
+</div>
+
+
+
+</div>
+
+
+
+
+
+<div class="container result-box">
+
+
+<h2>
+試算結果
+</h2>
+
+
+<div id="summary"></div>
+
+
+
+<h2>
+還款明細表
+</h2>
+
+
+<div class="note">
+※ 顯示前8期與後8期，中間期數省略
+</div>
+
+
+
+<table id="table">
+
+
+</table>
+
+
+
+</div>
+
+
+
+<script src="js/loan.js"></script>
+
+
+</body>
+
+</html>
