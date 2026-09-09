@@ -64,7 +64,7 @@ h4{font-size:14px;margin:6px 0;}
     <div class="input-row">
       <label>您的貸款金額是：</label>
       <input type="number" id="principal" value="">
-      <span class="unit">元</span>
+      <span class="unit">萬</span>
     </div>
     <div class="input-row">
       <label>貸款年數：</label>
@@ -94,12 +94,12 @@ h4{font-size:14px;margin:6px 0;}
     <div class="input-row">
       <label>起始貸款金額：</label>
       <input type="number" id="startPri" value="">
-      <span class="unit">元</span>
+      <span class="unit">萬</span>
     </div>
     <div class="input-row">
       <label>結束貸款金額：</label>
       <input type="number" id="endPri" value="">
-      <span class="unit">元</span>
+      <span class="unit">萬</span>
     </div>
     <div class="input-row">
       <label>貸款年數：</label>
@@ -126,7 +126,8 @@ h4{font-size:14px;margin:6px 0;}
 
 <script>
 // 共用試算函式
-function calcOne(P,year,apr,rocY,rocM){
+function calcOne(PWan,year,apr,rocY,rocM){
+  const P = PWan * 10000; //輸入是萬，轉成元計算
   const i = apr / 100 / 12;
   const n = year * 12;
   let payRate;
@@ -170,22 +171,23 @@ function calcOne(P,year,apr,rocY,rocM){
     totalInterest,
     totalPay:P+totalInterest,
     principal:P,
+    principalWan:PWan,
     rows
   }
 }
 
 // 單筆試算
 function calc(){
-  const P = Number(document.getElementById('principal').value);
+  const PWan = Number(document.getElementById('principal').value);
   const year = Number(document.getElementById('loanYear').value);
   const apr = Number(document.getElementById('annualRate').value);
   const rocY = Number(document.getElementById('rocYear').value);
   const rocM = Number(document.getElementById('rocMonth').value);
-  if(!P||!year||!apr||!rocY||!rocM){
+  if(!PWan||!year||!apr||!rocY||!rocM){
     alert("請填寫完整單筆欄位");
     return;
   }
-  const res = calcOne(P,year,apr,rocY,rocM);
+  const res = calcOne(PWan,year,apr,rocY,rocM);
   const html = buildSingleHtml(res);
   document.getElementById('resultContent').innerHTML = html;
   document.getElementById('resultBlock').style.display="block";
@@ -238,7 +240,7 @@ function buildSingleHtml(res){
       </div>
       <div class="sum-card">
         <div>貸款本金</div>
-        <div class="big-red">${res.principal.toLocaleString()} 元</div>
+        <div class="big-red">${res.principalWan.toLocaleString()} 萬</div>
       </div>
       <div class="sum-card">
         <div>總利息金額</div>
@@ -254,26 +256,25 @@ function buildSingleHtml(res){
 
 // 區間批量試算
 function batchCalc(){
-  const startPri = Number(document.getElementById('startPri').value);
-  const endPri = Number(document.getElementById('endPri').value);
+  const startWan = Number(document.getElementById('startPri').value);
+  const endWan = Number(document.getElementById('endPri').value);
   const year = Number(document.getElementById('batchLoanYear').value);
   const apr = Number(document.getElementById('batchRate').value);
-  const stepPri = 100000; //固定每次+10萬
-  if(!startPri||!endPri||!year||!apr){
+  const stepWan = 10; //固定遞增10萬
+  if(!startWan||!endWan||!year||!apr){
     alert("請填寫完整區間欄位");
     return;
   }
-  if(startPri>endPri){
+  if(startWan>endWan){
     alert("起始金額不可大於結束金額");
     return;
   }
   let html = "";
-  //批量跑，起始年月預設民國114年1月，批量不需要逐筆日期表，只顯示卡片
   let rocY=114,rocM=1;
-  for(let p=startPri;p<=endPri;p+=stepPri){
-    const res = calcOne(p,year,apr,rocY,rocM);
+  for(let pw=startWan;pw<=endWan;pw+=stepWan){
+    const res = calcOne(pw,year,apr,rocY,rocM);
     html += `<div class="batch-item">
-    <h4>貸款本金：${p.toLocaleString()} 元</h4>
+    <h4>貸款本金：${pw.toLocaleString()} 萬</h4>
     <div class="result-summary">
       <div class="sum-card">
         <div>每月應繳金額</div>
@@ -281,7 +282,7 @@ function batchCalc(){
       </div>
       <div class="sum-card">
         <div>貸款本金</div>
-        <div class="big-red">${res.principal.toLocaleString()} 元</div>
+        <div class="big-red">${pw.toLocaleString()} 萬</div>
       </div>
       <div class="sum-card">
         <div>總利息金額</div>
