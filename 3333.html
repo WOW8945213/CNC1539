@@ -32,7 +32,6 @@ td{border:1px solid #ccc;padding:5px;text-align:center;font-size:13px;}
 #resultBlock{padding:8px;}
 h3{font-size:16px;margin:6px 0;}
 h4{font-size:14px;margin:6px 0;}
-
 /* ========== 列印專用CSS ========== */
 @media print {
     body * {
@@ -61,7 +60,7 @@ h4{font-size:14px;margin:6px 0;}
     <div class="input-row">
       <label>您的貸款金額是：</label>
       <input type="number" id="principal" value="">
-      <span class="unit">元</span>
+      <span class="unit">萬</span>
     </div>
     <div class="input-row">
       <label>貸款年數：</label>
@@ -88,7 +87,6 @@ h4{font-size:14px;margin:6px 0;}
       <button onclick="printResult()">列印</button>
     </div>
   </div>
-
   <div id="resultBlock" style="display:none;">
     <h3>單筆試算結果</h3>
     <div style="margin-top:8px;">
@@ -128,21 +126,19 @@ h4{font-size:14px;margin:6px 0;}
     </div>
   </div>
 </div>
-
 <script>
 // 單筆試算
 function calc(){
-  const P = Number(document.getElementById('principal').value);
+  const PWan = Number(document.getElementById('principal').value);
   const year = Number(document.getElementById('loanYear').value);
   const apr = Number(document.getElementById('annualRate').value);
   const rocY = Number(document.getElementById('rocYear').value);
   const rocM = Number(document.getElementById('rocMonth').value);
-
-  if(!P||!year||!apr||!rocY||!rocM){
+  if(!PWan||!year||!apr||!rocY||!rocM){
     alert("請填寫完整欄位");
     return;
   }
-
+  const P = PWan * 10000; //輸入萬，轉元計算
   const i = apr / 100 / 12;
   const n = year * 12;
   let payRate;
@@ -152,13 +148,11 @@ function calc(){
     payRate = ( Math.pow(1+i,n) * i ) / ( Math.pow(1+i,n) - 1 );
   }
   const monthPay = P * payRate;
-
   let balance = P;
   let totalInterest = 0;
   const rows = [];
   let cy = rocY;
   let cm = rocM;
-
   for(let k=1;k<=n;k++){
     let intMonth = balance * i;
     let priMonth = monthPay - intMonth;
@@ -168,7 +162,6 @@ function calc(){
     }
     balance = balance - priMonth;
     totalInterest += intMonth;
-
     //民國日期
     let dateStr = `${cy}/${String(cm).padStart(2,'0')}`;
     rows.push({
@@ -185,30 +178,25 @@ function calc(){
       cy++;
     }
   }
-
-  //填入摘要
+  //填入摘要：貸款本金顯示萬，其餘維持元
   document.getElementById('monthPayText').innerText = Math.round(monthPay).toLocaleString() + ' 元';
-  document.getElementById('priText').innerText = P.toLocaleString() + ' 元';
+  document.getElementById('priText').innerText = PWan.toLocaleString() + ' 萬';
   document.getElementById('totalPayText').innerText = Math.round(P + totalInterest).toLocaleString() + ' 元';
   document.getElementById('totalIntText').innerText = Math.round(totalInterest).toLocaleString() + ' 元';
-
   //組表格：前8筆 + 省略列 + 最後8筆
   const tbody = document.getElementById('scheduleBody');
   tbody.innerHTML = "";
   const showFront = rows.slice(0,8);
   const showBack = rows.slice(-8);
   showFront.forEach(r=> addRow(tbody,r));
-
   //省略列
   const omitTr = document.createElement('tr');
   omitTr.className = "omit-row";
   omitTr.innerHTML = `<td colspan="6">……中間期數省略……</td>`;
   tbody.appendChild(omitTr);
-
   showBack.forEach(r=> addRow(tbody,r));
   document.getElementById('resultBlock').style.display = "block";
 }
-
 function addRow(tbody,r){
   const tr = document.createElement('tr');
   tr.innerHTML = `
@@ -221,7 +209,6 @@ function addRow(tbody,r){
   `;
   tbody.appendChild(tr);
 }
-
 // 清除全部欄位與結果
 function clearAll(){
   document.getElementById('principal').value='';
@@ -231,7 +218,6 @@ function clearAll(){
   document.getElementById('annualRate').value='';
   document.getElementById('resultBlock').style.display="none";
 }
-
 // 列印功能
 function printResult(){
   if(document.getElementById('resultBlock').style.display === "none"){
