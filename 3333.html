@@ -103,7 +103,7 @@ td{border:1px solid #ccc;padding:7px;text-align:center;}
         <tbody id="scheduleBody"></tbody>
       </table>
     </div>
-    <!-- 移到最下面 -->
+    <!-- 摘要卡片順序：每月應繳金額 → 貸款本金 → 總利息金額 → 總繳款金額 -->
     <div class="result-summary" style="margin-top:15px;">
       <div class="sum-card">
         <div>每月應繳金額</div>
@@ -114,12 +114,12 @@ td{border:1px solid #ccc;padding:7px;text-align:center;}
         <div class="big-red" id="priText"></div>
       </div>
       <div class="sum-card">
-        <div>總繳款金額</div>
-        <div class="big-red" id="totalPayText"></div>
-      </div>
-      <div class="sum-card">
         <div>總利息金額</div>
         <div class="big-red" id="totalIntText"></div>
+      </div>
+      <div class="sum-card">
+        <div>總繳款金額</div>
+        <div class="big-red" id="totalPayText"></div>
       </div>
     </div>
   </div>
