@@ -1,0 +1,271 @@
+function moneyFormat(num){
+
+return Math.round(num)
+.toLocaleString();
+
+}
+
+
+
+function calculate(){
+
+
+let P =
+Number(document.getElementById("money").value);
+
+
+let years =
+Number(document.getElementById("year").value);
+
+
+let rate =
+Number(document.getElementById("rate").value)
+/100;
+
+
+
+let months = years*12;
+
+
+let r = rate/12;
+
+
+
+// 本息平均攤還
+
+let payment =
+P*r*Math.pow(1+r,months) /
+(Math.pow(1+r,months)-1);
+
+
+
+let total =
+payment*months;
+
+
+let interest =
+total-P;
+
+
+
+document.getElementById("summary").innerHTML=`
+
+<div class="summary">
+
+
+<div class="card">
+
+<div class="card-title">
+貸款本金
+</div>
+
+<div class="money">
+${moneyFormat(P)} 元
+</div>
+
+</div>
+
+
+
+<div class="card">
+
+<div class="card-title">
+每月應繳金額
+</div>
+
+<div class="money">
+${moneyFormat(payment)} 元
+</div>
+
+</div>
+
+
+
+<div class="card">
+
+<div class="card-title">
+總利息金額
+</div>
+
+<div class="money">
+${moneyFormat(interest)} 元
+</div>
+
+</div>
+
+
+
+<div class="card">
+
+<div class="card-title">
+總繳款金額
+</div>
+
+<div class="money">
+${moneyFormat(total)} 元
+</div>
+
+</div>
+
+
+
+</div>
+
+`;
+
+
+
+
+let rows=[];
+
+
+let remain=P;
+
+
+let sy =
+Number(document.getElementById("syear").value);
+
+
+let sm =
+Number(document.getElementById("smonth").value);
+
+
+
+for(let i=1;i<=months;i++){
+
+
+let interestMonth =
+remain*r;
+
+
+let principal =
+payment-interestMonth;
+
+
+remain-=principal;
+
+
+if(remain<0)
+remain=0;
+
+
+
+rows.push({
+
+period:i,
+
+date:
+(sy+Math.floor((sm+i-2)/12))
++
+"/"
++
+String((sm+i-2)%12+1)
+.padStart(2,"0"),
+
+payment,
+
+principal,
+
+interest:interestMonth,
+
+remain
+
+
+});
+
+
+}
+
+
+
+
+let show=[];
+
+
+if(months<=16){
+
+show=rows;
+
+}else{
+
+show=[
+...rows.slice(0,8),
+"more",
+...rows.slice(-8)
+];
+
+}
+
+
+
+let html=`
+
+<tr>
+
+<th>期數</th>
+<th>繳款日期</th>
+<th>每月應繳</th>
+<th>本金</th>
+<th>利息</th>
+<th>剩餘本金</th>
+
+</tr>
+
+`;
+
+
+
+show.forEach(r=>{
+
+
+if(r==="more"){
+
+html+=`
+
+<tr class="more">
+
+<td colspan="6">
+
+...... 中間期數省略 ......
+
+</td>
+
+</tr>
+
+`;
+
+return;
+
+}
+
+
+
+html+=`
+
+<tr>
+
+<td>${r.period}</td>
+
+<td>${r.date}</td>
+
+<td>${moneyFormat(r.payment)}</td>
+
+<td>${moneyFormat(r.principal)}</td>
+
+<td>${moneyFormat(r.interest)}</td>
+
+<td>${moneyFormat(r.remain)}</td>
+
+</tr>
+
+`;
+
+});
+
+
+
+document.getElementById("table").innerHTML=html;
+
+
+}
+
