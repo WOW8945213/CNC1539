@@ -13,7 +13,10 @@ body{padding:20px;background:#fff;}
 .input-row{display:flex;align-items:center;margin:8px 0;gap:8px;}
 .input-row label{width:220px;padding:4px;}
 .input-row input{padding:6px;font-size:16px;width:280px;}
-.input-row .unit{width:30px;}
+.input-row .unit{padding:0 4px;}
+/* 同列雙輸入框 */
+.inline-group{display:flex;gap:8px;align-items:center;}
+.inline-group input{width:120px;}
 
 .btn-group{text-align:center;margin:10px 0;}
 button{padding:6px 16px;font-size:16px;margin:0 4px;cursor:pointer;}
@@ -62,14 +65,13 @@ td{border:1px solid #ccc;padding:7px;text-align:right;}
       <span class="unit">年</span>
     </div>
     <div class="input-row">
-      <label>貸款起始(民國)年月是：</label>
-      <input type="number" id="rocYear" value="">
-      <span class="unit">年</span>
-    </div>
-    <div class="input-row">
-      <label></label>
-      <input type="number" id="rocMonth" value="">
-      <span class="unit">月</span>
+      <label>貸款起始(民國)年月：</label>
+      <div class="inline-group">
+        <input type="number" id="rocYear" value="">
+        <span class="unit">年</span>
+        <input type="number" id="rocMonth" value="">
+        <span class="unit">月</span>
+      </div>
     </div>
     <div class="input-row">
       <label>年利率：</label>
