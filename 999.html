@@ -5,129 +5,403 @@
 <title>本息平均攤還試算</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-*{box-sizing:border-box;font-family: "Microsoft JhengHei",sans-serif;}
-body{padding:10px;background:#fff;margin:0;}
-.wrap{max-width:720px;margin:0 auto;border:1px solid #337ab7;}
-.title-bar{background:#2767ad;color:#fff;padding:8px;text-align:center;font-size:18px;font-weight:bold;}
-.input-area{background:#e8f2ff;padding:10px;}
-.input-row{display:flex;align-items:center;margin:6px 0;gap:6px;}
-.input-row label{width:180px;padding:3px;font-size:14px;}
-.input-row input{padding:5px;font-size:14px;width:200px;}
-.input-row .unit{padding:0 3px;font-size:14px;}
-.inline-group{display:flex;gap:6px;align-items:center;}
-.inline-group input{width:90px;}
-.btn-group{text-align:center;margin:8px 0;}
-button{padding:5px 12px;font-size:14px;margin:0 3px;cursor:pointer;}
-.result-summary{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;margin:8px 0;gap:6px;}
-.sum-card{border:1px solid #ccc;padding:4px 2px;text-align:center;}
-.sum-card div{font-size:23px;}
-.sum-card .big-red{
-  font-size:24px;color:red;font-weight:bold;margin-top:4px;
+*{box-sizing:border-box;font-family: "Microsoft JhengHei", "Noto Sans TC", sans-serif;}
+body{
+  margin:0;
+  padding:12px;
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+  color:#333;
+}
+.page{
+  max-width:1280px;
+  margin:0 auto;
+  border-radius:14px;
+  overflow:hidden;
+  box-shadow:0 10px 30px rgba(255,100,0,0.12);
+  background:#fff;
+}
+.header{
+  background: linear-gradient(90deg, #ff7a00 0%, #ffb347 100%);
+  color:#fff;
+  padding:14px 20px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+.header h1{
+  font-size:18px;
+  margin:0;
+  font-weight:700;
+}
+.tab-wrap{
+  display:flex;
+  gap:8px;
+}
+.tab{
+  padding:6px 14px;
+  border-radius:20px;
+  font-size:14px;
+  cursor:pointer;
+  border:none;
+}
+.tab.active{
+  background:#fff;
+  color:#ff7a00;
+  font-weight:bold;
+}
+.tab.inactive{
+  background:rgba(255,255,255,0.18);
+  color:#fff;
+}
+.layout{
+  display:grid;
+  grid-template-columns: 300px 1fr;
+  gap:14px;
+  padding:14px;
+}
+.sidebar{
+  background:#fff;
+  border:1px solid #ffe0b2;
+  border-radius:12px;
+  padding:14px;
+  box-shadow:0 4px 14px rgba(255,100,0,0.06);
+}
+.sidebar h3{
+  font-size:14px;
+  margin:0 0 10px 0;
+  color:#ff7a00;
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+.sidebar h3::before{
+  content:"";
+  display:inline-block;
+  width:4px;
+  height:14px;
+  background:#ff7a00;
+  border-radius:2px;
+}
+.field{
+  margin-bottom:10px;
+}
+.field label{
+  display:block;
+  font-size:12px;
+  color:#666;
+  margin-bottom:4px;
+}
+.field input{
+  width:100%;
+  padding:8px 10px;
+  border:1px solid #ffd9a8;
+  border-radius:8px;
+  font-size:14px;
+  background:#fffaf0;
+  transition:border-color .2s;
+}
+.field input:focus{
+  outline:none;
+  border-color:#ff7a00;
+  background:#fff;
+}
+.inline{
+  display:flex;
+  gap:8px;
+}
+.inline .field{flex:1;}
+.btn{
+  width:100%;
+  padding:10px;
+  border:none;
+  border-radius:8px;
+  font-size:14px;
+  font-weight:600;
+  cursor:pointer;
+  transition:transform .1s, box-shadow .2s;
+}
+.btn-primary{
+  background: linear-gradient(90deg, #ff7a00, #ff9a3c);
+  color:#fff;
+  box-shadow:0 4px 10px rgba(255,100,0,0.25);
+}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 14px rgba(255,100,0,0.3);}
+.btn-secondary{
+  background:#fff;
+  color:#ff7a00;
+  border:1px solid #ffd9a8;
+}
+.btn-group{display:flex;gap:8px;margin-top:10px;}
+.btn-group .btn{flex:1;}
+
+.main{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+.summary-cards{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+}
+.summary-card{
+  background:#fff;
+  border:1px solid #ffe0b2;
+  border-radius:12px;
+  padding:14px;
+  box-shadow:0 4px 14px rgba(255,100,0,0.06);
+}
+.summary-card .label{
+  font-size:12px;
+  color:#888;
+  margin-bottom:6px;
+}
+.summary-card .value{
+  font-size:22px;
+  font-weight:700;
+  color:#ff7a00;
   white-space:nowrap;
 }
-table{width:100%;border-collapse:collapse;margin-top:8px;}
-th{background:#2767ad;color:#fff;padding:6px;text-align:center;font-size:14px;}
-td{border:1px solid #ccc;padding:5px;text-align:center;font-size:13px;}
-.omit-row td{text-align:center;color:#333;background:#f4f8ff;font-size:13px;}
-#resultBlock{padding:8px;}
-h3{font-size:16px;margin:6px 0;}
-h4{font-size:14px;margin:6px 0;}
-/* ========== 列印專用CSS ========== */
+.summary-card.highlight{
+  background: linear-gradient(135deg, #ff7a00, #ff9a3c);
+  color:#fff;
+  border:none;
+}
+.summary-card.highlight .label{color:rgba(255,255,255,0.85);}
+.summary-card.highlight .value{color:#fff;}
+
+.section{
+  background:#fff;
+  border:1px solid #ffe0b2;
+  border-radius:12px;
+  padding:14px;
+  box-shadow:0 4px 14px rgba(255,100,0,0.06);
+}
+.section h3{
+  font-size:14px;
+  margin:0 0 10px 0;
+  color:#ff7a00;
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+.section h3::before{
+  content:"";
+  display:inline-block;
+  width:4px;
+  height:14px;
+  background:#ff7a00;
+  border-radius:2px;
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:13px;
+}
+th{
+  background:#fff3e0;
+  color:#ff7a00;
+  padding:8px;
+  text-align:center;
+  font-weight:600;
+}
+td{
+  padding:7px;
+  text-align:center;
+  border-bottom:1px solid #fff3e0;
+}
+tr:nth-child(even) td{background:#fffaf0;}
+.omit-row td{
+  text-align:center;
+  color:#888;
+  background:#fff3e0;
+}
+.formula{
+  margin-top:10px;
+  padding:10px;
+  background:#fffaf0;
+  border-radius:8px;
+  font-size:12px;
+  color:#666;
+}
+.formula strong{color:#ff7a00;}
+
+.batch-table th{
+  background:#ff7a00;
+  color:#fff;
+}
+
+@media (max-width: 900px){
+  .layout{grid-template-columns:1fr;}
+  .summary-cards{grid-template-columns:repeat(2,1fr);}
+}
 @media print {
-    body * {
-        visibility: hidden;
-    }
-    #resultBlock, #resultBlock * {
-        visibility: visible;
-    }
-    #resultBlock {
-        position: absolute;
-        left:0;
-        top:0;
-        width:100%;
-        border:none;
-    }
-    .btn-group, button {
-        display: none !important;
-    }
+  body * {visibility:hidden;}
+  #resultBlock, #resultBlock * {visibility:visible;}
+  #resultBlock{
+    position:absolute;
+    left:0;top:0;width:100%;
+    border:none;box-shadow:none;
+  }
+  .header,.sidebar,.btn-group{display:none !important;}
 }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="title-bar">本息平均攤還試算</div>
-  <div class="input-area">
-    <div class="input-row">
-      <label>您的貸款金額是：</label>
-      <input type="number" id="principal" value="">
-      <span class="unit">萬</span>
-    </div>
-    <div class="input-row">
-      <label>貸款年數：</label>
-      <input type="number" id="loanYear" value="">
-      <span class="unit">年</span>
-    </div>
-    <div class="input-row">
-      <label>貸款起始(民國)年月：</label>
-      <div class="inline-group">
-        <input type="number" id="rocYear" value="">
-        <span class="unit">年</span>
-        <input type="number" id="rocMonth" value="">
-        <span class="unit">月</span>
-      </div>
-    </div>
-    <div class="input-row">
-      <label>年利率：</label>
-      <input type="number" step="0.01" id="annualRate" value="">
-      <span class="unit">%</span>
-    </div>
-    <div class="btn-group">
-      <button onclick="calc()">試算</button>
-      <button onclick="clearAll()">清除</button>
-      <button onclick="printResult()">列印</button>
+<div class="page">
+  <div class="header">
+    <h1>本息平均攤還試算</h1>
+    <div class="tab-wrap">
+      <button class="tab active" onclick="switchTab('single')">單筆試算</button>
+      <button class="tab inactive" onclick="switchTab('batch')">區間試算</button>
     </div>
   </div>
-  <div id="resultBlock" style="display:none;">
-    <h3>單筆試算結果</h3>
-    <div style="margin-top:8px;">
-      <h4>還款明細表（僅顯示前8期與後8期，中間期數省略）</h4>
-      <table>
-        <thead>
-          <tr>
-            <th>期數</th>
-            <th>繳款日期</th>
-            <th>每月應繳</th>
-            <th>本金</th>
-            <th>利息</th>
-            <th>剩餘本金</th>
-          </tr>
-        </thead>
-        <tbody id="scheduleBody"></tbody>
-      </table>
+  <div class="layout">
+    <div class="sidebar">
+      <div id="panelSingle">
+        <h3>輸入試算資料</h3>
+        <div class="field">
+          <label>貸款金額（萬元）</label>
+          <input type="number" id="principal" value="">
+        </div>
+        <div class="field">
+          <label>貸款年數</label>
+          <input type="number" id="loanYear" value="">
+        </div>
+        <div class="inline">
+          <div class="field">
+            <label>起始民國年</label>
+            <input type="number" id="rocYear" value="">
+          </div>
+          <div class="field">
+            <label>起始月份</label>
+            <input type="number" id="rocMonth" value="">
+          </div>
+        </div>
+        <div class="field">
+          <label>年利率（%）</label>
+          <input type="number" step="0.01" id="annualRate" value="">
+        </div>
+        <div class="btn-group">
+          <button class="btn btn-primary" onclick="calc()">試算</button>
+          <button class="btn btn-secondary" onclick="clearAll()">清除</button>
+        </div>
+      </div>
+      <div id="panelBatch" style="display:none;">
+        <h3>區間批量試算資料</h3>
+        <div class="field">
+          <label>貸款起金額（萬）</label>
+          <input type="number" id="startWan" value="">
+        </div>
+        <div class="field">
+          <label>貸款迄金額（萬）</label>
+          <input type="number" id="endWan" value="">
+        </div>
+        <div class="field">
+          <label>每次增加金額（萬）</label>
+          <input type="number" id="stepWan" value="">
+        </div>
+        <div class="field">
+          <label>貸款年數</label>
+          <input type="number" id="batchLoanYear" value="">
+        </div>
+        <div class="field">
+          <label>年利率（%）</label>
+          <input type="number" step="0.01" id="batchRate" value="">
+        </div>
+        <div class="btn-group">
+          <button class="btn btn-primary" onclick="calcBatch()">開始區間試算</button>
+          <button class="btn btn-secondary" onclick="clearBatch()">清除</button>
+        </div>
+      </div>
     </div>
-    <!-- 摘要卡片順序：每月應繳金額 → 貸款本金 → 總利息金額 → 總繳款金額 -->
-    <div class="result-summary" style="margin-top:10px;">
-      <div class="sum-card">
-        <div>每月應繳金額</div>
-        <div class="big-red" id="monthPayText"></div>
+
+    <div class="main">
+      <!--單筆結果-->
+      <div id="resultBlock" style="display:none;">
+        <div class="summary-cards">
+          <div class="summary-card">
+            <div class="label">貸款本金</div>
+            <div class="value" id="priText"></div>
+          </div>
+          <div class="summary-card">
+            <div class="label">每月應繳金額</div>
+            <div class="value" id="monthPayText"></div>
+          </div>
+          <div class="summary-card">
+            <div class="label">總利息金額</div>
+            <div class="value" id="totalIntText"></div>
+          </div>
+          <div class="summary-card highlight">
+            <div class="label">總繳款金額</div>
+            <div class="value" id="totalPayText"></div>
+          </div>
+        </div>
+        <div class="section">
+          <h3>還款明細表（前8期與後8期）</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>期數</th>
+                <th>繳款日期</th>
+                <th>每月應繳(萬)</th>
+                <th>本金(萬)</th>
+                <th>利息(萬)</th>
+                <th>剩餘本金(萬)</th>
+              </tr>
+            </thead>
+            <tbody id="scheduleBody"></tbody>
+          </table>
+          <div class="formula">
+            <strong>計算公式：</strong>每月應繳金額＝本金 × [月利率 × (1＋月利率)<sup>期數</sup>] ÷ [(1＋月利率)<sup>期數</sup>－1]
+          </div>
+        </div>
       </div>
-      <div class="sum-card">
-        <div>貸款本金</div>
-        <div class="big-red" id="priText"></div>
-      </div>
-      <div class="sum-card">
-        <div>總利息金額</div>
-        <div class="big-red" id="totalIntText"></div>
-      </div>
-      <div class="sum-card">
-        <div>總繳款金額</div>
-        <div class="big-red" id="totalPayText"></div>
+
+      <!--區間批量結果-->
+      <div id="batchResult" class="section" style="display:none;">
+        <h3>區間試算結果（單位：萬元）</h3>
+        <table class="batch-table">
+          <thead>
+            <tr>
+              <th>貸款金額(萬)</th>
+              <th>每月應繳(萬)</th>
+              <th>總利息(萬)</th>
+              <th>總繳款(萬)</th>
+            </tr>
+          </thead>
+          <tbody id="batchBody"></tbody>
+        </table>
       </div>
     </div>
   </div>
 </div>
+
 <script>
-// 單筆試算
+// 頁籤切換
+function switchTab(mode){
+  document.querySelectorAll('.tab').forEach(t=>{
+    t.classList.remove('active');
+    t.classList.add('inactive');
+  })
+  if(mode==='single'){
+    document.querySelector('.tab:nth-child(1)').classList.add('active');
+    document.querySelector('.tab:nth-child(2)').classList.remove('active');
+    document.getElementById('panelSingle').style.display="block";
+    document.getElementById('panelBatch').style.display="none";
+    document.getElementById('resultBlock').style.display="none";
+    document.getElementById('batchResult').style.display="none";
+  }else{
+    document.querySelector('.tab:nth-child(2)').classList.add('active');
+    document.querySelector('.tab:nth-child(1)').classList.remove('active');
+    document.getElementById('panelSingle').style.display="none";
+    document.getElementById('panelBatch').style.display="block";
+    document.getElementById('resultBlock').style.display="none";
+    document.getElementById('batchResult').style.display="none";
+  }
+}
+
+//單筆試算
 function calc(){
   const PWan = Number(document.getElementById('principal').value);
   const year = Number(document.getElementById('loanYear').value);
@@ -138,7 +412,7 @@ function calc(){
     alert("請填寫完整欄位");
     return;
   }
-  const P = PWan * 10000; //輸入萬，轉元計算
+  const P = PWan * 10000;
   const i = apr / 100 / 12;
   const n = year * 12;
   let payRate;
@@ -162,7 +436,6 @@ function calc(){
     }
     balance = balance - priMonth;
     totalInterest += intMonth;
-    //民國日期
     let dateStr = `${cy}/${String(cm).padStart(2,'0')}`;
     rows.push({
       period:k,
@@ -173,43 +446,39 @@ function calc(){
       bal:balance
     })
     cm++;
-    if(cm>12){
-      cm=1;
-      cy++;
-    }
+    if(cm>12){cm=1;cy++;}
   }
-  //填入摘要：貸款本金顯示萬，其餘維持元
-  document.getElementById('monthPayText').innerText = Math.round(monthPay).toLocaleString() + ' 元';
+  //卡片全部萬元顯示
   document.getElementById('priText').innerText = PWan.toLocaleString() + ' 萬';
-  document.getElementById('totalPayText').innerText = Math.round(P + totalInterest).toLocaleString() + ' 元';
-  document.getElementById('totalIntText').innerText = Math.round(totalInterest).toLocaleString() + ' 元';
-  //組表格：前8筆 + 省略列 + 最後8筆
+  document.getElementById('monthPayText').innerText = (monthPay / 10000).toFixed(2).toLocaleString() + ' 萬';
+  document.getElementById('totalIntText').innerText = (totalInterest / 10000).toFixed(2).toLocaleString() + ' 萬';
+  document.getElementById('totalPayText').innerText = ((P + totalInterest)/10000).toFixed(2).toLocaleString() + ' 萬';
+
   const tbody = document.getElementById('scheduleBody');
   tbody.innerHTML = "";
   const showFront = rows.slice(0,8);
   const showBack = rows.slice(-8);
   showFront.forEach(r=> addRow(tbody,r));
-  //省略列
   const omitTr = document.createElement('tr');
   omitTr.className = "omit-row";
   omitTr.innerHTML = `<td colspan="6">……中間期數省略……</td>`;
   tbody.appendChild(omitTr);
   showBack.forEach(r=> addRow(tbody,r));
-  document.getElementById('resultBlock').style.display = "block";
+  document.getElementById('resultBlock').style.display = "flex";
+  document.getElementById('batchResult').style.display="none";
 }
 function addRow(tbody,r){
   const tr = document.createElement('tr');
   tr.innerHTML = `
     <td>${r.period}</td>
     <td>${r.date}</td>
-    <td>${Math.round(r.monthPay).toLocaleString()}</td>
-    <td>${Math.round(r.pri).toLocaleString()}</td>
-    <td>${Math.round(r.int).toLocaleString()}</td>
-    <td>${Math.round(r.bal).toLocaleString()}</td>
+    <td>${(r.monthPay/10000).toFixed(2)}</td>
+    <td>${(r.pri/10000).toFixed(2)}</td>
+    <td>${(r.int/10000).toFixed(2)}</td>
+    <td>${(r.bal/10000).toFixed(2)}</td>
   `;
   tbody.appendChild(tr);
 }
-// 清除全部欄位與結果
 function clearAll(){
   document.getElementById('principal').value='';
   document.getElementById('loanYear').value='';
@@ -218,13 +487,51 @@ function clearAll(){
   document.getElementById('annualRate').value='';
   document.getElementById('resultBlock').style.display="none";
 }
-// 列印功能
-function printResult(){
-  if(document.getElementById('resultBlock').style.display === "none"){
-    alert("請先執行試算，才能列印！");
+
+//區間批量試算
+function calcBatch(){
+  const startW = Number(document.getElementById('startWan').value);
+  const endW = Number(document.getElementById('endWan').value);
+  const stepW = Number(document.getElementById('stepWan').value);
+  const year = Number(document.getElementById('batchLoanYear').value);
+  const apr = Number(document.getElementById('batchRate').value);
+  if(!startW || !endW || !stepW || !year || !apr){
+    alert("請填寫完整區間資料");
     return;
   }
-  window.print();
+  const i = apr /100 /12;
+  const n = year *12;
+  let payRate = Math.abs(i)<1e-12 ? 1/n : (Math.pow(1+i,n)*i)/(Math.pow(1+i,n)-1);
+  const batchTbody = document.getElementById('batchBody');
+  batchTbody.innerHTML="";
+
+  let current = startW;
+  while(current <= endW){
+    const P = current *10000;
+    const monthPay = P * payRate;
+    const totalPay = monthPay * n;
+    const totalInt = totalPay - P;
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${current.toLocaleString()}</td>
+      <td>${(monthPay/10000).toFixed(2)}</td>
+      <td>${(totalInt/10000).toFixed(2)}</td>
+      <td>${(totalPay/10000).toFixed(2)}</td>
+    `;
+    batchTbody.appendChild(tr);
+    current += stepW;
+  }
+  document.getElementById('batchResult').style.display="block";
+  document.getElementById('resultBlock').style.display="none";
+}
+function clearBatch(){
+  document.getElementById('startWan').value='';
+  document.getElementById('endWan').value='';
+  document.getElementById('stepWan').value='';
+  document.getElementById('batchLoanYear').value='';
+  document.getElementById('batchRate').value='';
+  document.getElementById('batchResult').style.display="none";
 }
 </script>
 </body>
