@@ -8,12 +8,12 @@
 *{box-sizing:border-box;font-family: "Microsoft JhengHei", "Noto Sans TC", sans-serif;}
 body{
   margin:0;
-  padding:12px;
+  padding:20px;
   background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
   color:#333;
 }
 .page{
-  max-width:1280px;
+  max-width:1400px;
   margin:0 auto;
   border-radius:14px;
   overflow:hidden;
@@ -23,24 +23,24 @@ body{
 .header{
   background: linear-gradient(90deg, #ff7a00 0%, #ffb347 100%);
   color:#fff;
-  padding:14px 20px;
+  padding:16px 24px;
   display:flex;
   align-items:center;
   justify-content:space-between;
 }
 .header h1{
-  font-size:18px;
+  font-size:20px;
   margin:0;
   font-weight:700;
 }
 .tab-wrap{
   display:flex;
-  gap:8px;
+  gap:10px;
 }
 .tab{
-  padding:6px 14px;
-  border-radius:20px;
-  font-size:14px;
+  padding:8px 18px;
+  border-radius:24px;
+  font-size:15px;
   cursor:pointer;
   border:none;
 }
@@ -50,53 +50,53 @@ body{
   font-weight:bold;
 }
 .tab.inactive{
-  background:rgba(255,255,255,0.18);
+  background:rgba(255,255,255,0.2);
   color:#fff;
 }
 .layout{
   display:grid;
-  grid-template-columns: 300px 1fr;
-  gap:14px;
-  padding:14px;
+  grid-template-columns: 320px 1fr;
+  gap:20px;
+  padding:20px;
 }
 .sidebar{
   background:#fff;
   border:1px solid #ffe0b2;
   border-radius:12px;
-  padding:14px;
+  padding:18px;
   box-shadow:0 4px 14px rgba(255,100,0,0.06);
 }
 .sidebar h3{
-  font-size:14px;
-  margin:0 0 10px 0;
+  font-size:16px;
+  margin:0 0 14px 0;
   color:#ff7a00;
   display:flex;
   align-items:center;
-  gap:6px;
+  gap:8px;
 }
 .sidebar h3::before{
   content:"";
   display:inline-block;
-  width:4px;
-  height:14px;
+  width:5px;
+  height:16px;
   background:#ff7a00;
   border-radius:2px;
 }
 .field{
-  margin-bottom:10px;
+  margin-bottom:14px;
 }
 .field label{
   display:block;
-  font-size:12px;
+  font-size:13px;
   color:#666;
-  margin-bottom:4px;
+  margin-bottom:5px;
 }
 .field input{
   width:100%;
-  padding:8px 10px;
+  padding:10px 12px;
   border:1px solid #ffd9a8;
   border-radius:8px;
-  font-size:14px;
+  font-size:15px;
   background:#fffaf0;
   transition:border-color .2s;
 }
@@ -107,15 +107,15 @@ body{
 }
 .inline{
   display:flex;
-  gap:8px;
+  gap:10px;
 }
 .inline .field{flex:1;}
 .btn{
   width:100%;
-  padding:10px;
+  padding:11px;
   border:none;
   border-radius:8px;
-  font-size:14px;
+  font-size:15px;
   font-weight:600;
   cursor:pointer;
   transition:transform .1s, box-shadow .2s;
@@ -131,33 +131,34 @@ body{
   color:#ff7a00;
   border:1px solid #ffd9a8;
 }
-.btn-group{display:flex;gap:8px;margin-top:10px;}
+.btn-group{display:flex;gap:10px;margin-top:14px;}
 .btn-group .btn{flex:1;}
 
 .main{
   display:flex;
   flex-direction:column;
-  gap:14px;
+  gap:20px;
 }
+/* 【重點：電腦版卡片橫排4格，對齊參考圖樣式】 */
 .summary-cards{
   display:grid;
   grid-template-columns:repeat(4,1fr);
-  gap:10px;
+  gap:16px;
 }
 .summary-card{
   background:#fff;
   border:1px solid #ffe0b2;
   border-radius:12px;
-  padding:14px;
+  padding:20px 16px;
   box-shadow:0 4px 14px rgba(255,100,0,0.06);
 }
 .summary-card .label{
-  font-size:12px;
+  font-size:14px;
   color:#888;
-  margin-bottom:6px;
+  margin-bottom:8px;
 }
 .summary-card .value{
-  font-size:22px;
+  font-size:26px;
   font-weight:700;
   color:#ff7a00;
   white-space:nowrap;
@@ -174,39 +175,39 @@ body{
   background:#fff;
   border:1px solid #ffe0b2;
   border-radius:12px;
-  padding:14px;
+  padding:20px;
   box-shadow:0 4px 14px rgba(255,100,0,0.06);
 }
 .section h3{
-  font-size:14px;
-  margin:0 0 10px 0;
+  font-size:16px;
+  margin:0 0 14px 0;
   color:#ff7a00;
   display:flex;
   align-items:center;
-  gap:6px;
+  gap:8px;
 }
 .section h3::before{
   content:"";
   display:inline-block;
-  width:4px;
-  height:14px;
+  width:5px;
+  height:16px;
   background:#ff7a00;
   border-radius:2px;
 }
 table{
   width:100%;
   border-collapse:collapse;
-  font-size:13px;
+  font-size:14px;
 }
 th{
   background:#fff3e0;
   color:#ff7a00;
-  padding:8px;
+  padding:10px;
   text-align:center;
   font-weight:600;
 }
 td{
-  padding:7px;
+  padding:9px;
   text-align:center;
   border-bottom:1px solid #fff3e0;
 }
@@ -217,11 +218,11 @@ tr:nth-child(even) td{background:#fffaf0;}
   background:#fff3e0;
 }
 .formula{
-  margin-top:10px;
-  padding:10px;
+  margin-top:14px;
+  padding:12px;
   background:#fffaf0;
   border-radius:8px;
-  font-size:12px;
+  font-size:13px;
   color:#666;
 }
 .formula strong{color:#ff7a00;}
@@ -230,10 +231,10 @@ tr:nth-child(even) td{background:#fffaf0;}
   background:#ff7a00;
   color:#fff;
 }
-
+/* 電腦版關閉手機自適應，不切兩欄 */
 @media (max-width: 900px){
-  .layout{grid-template-columns:1fr;}
-  .summary-cards{grid-template-columns:repeat(2,1fr);}
+  .layout{grid-template-columns: 320px 1fr !important;}
+  .summary-cards{grid-template-columns:repeat(4,1fr) !important;}
 }
 @media print {
   body * {visibility:hidden;}
@@ -344,10 +345,10 @@ tr:nth-child(even) td{background:#fffaf0;}
               <tr>
                 <th>期數</th>
                 <th>繳款日期</th>
-                <th>每月應繳(萬)</th>
-                <th>本金(萬)</th>
-                <th>利息(萬)</th>
-                <th>剩餘本金(萬)</th>
+                <th>每月應繳(元)</th>
+                <th>本金(元)</th>
+                <th>利息(元)</th>
+                <th>剩餘本金(元)</th>
               </tr>
             </thead>
             <tbody id="scheduleBody"></tbody>
@@ -360,14 +361,14 @@ tr:nth-child(even) td{background:#fffaf0;}
 
       <!--區間批量結果-->
       <div id="batchResult" class="section" style="display:none;">
-        <h3>區間試算結果（單位：萬元）</h3>
+        <h3>區間試算結果（單位：元）</h3>
         <table class="batch-table">
           <thead>
             <tr>
-              <th>貸款金額(萬)</th>
-              <th>每月應繳(萬)</th>
-              <th>總利息(萬)</th>
-              <th>總繳款(萬)</th>
+              <th>貸款金額(元)</th>
+              <th>每月應繳(元)</th>
+              <th>總利息(元)</th>
+              <th>總繳款(元)</th>
             </tr>
           </thead>
           <tbody id="batchBody"></tbody>
@@ -448,11 +449,11 @@ function calc(){
     cm++;
     if(cm>12){cm=1;cy++;}
   }
-  //卡片全部萬元顯示
-  document.getElementById('priText').innerText = PWan.toLocaleString() + ' 萬';
-  document.getElementById('monthPayText').innerText = (monthPay / 10000).toFixed(2).toLocaleString() + ' 萬';
-  document.getElementById('totalIntText').innerText = (totalInterest / 10000).toFixed(2).toLocaleString() + ' 萬';
-  document.getElementById('totalPayText').innerText = ((P + totalInterest)/10000).toFixed(2).toLocaleString() + ' 萬';
+  //卡片全部以元顯示
+  document.getElementById('priText').innerText = P.toLocaleString() + ' 元';
+  document.getElementById('monthPayText').innerText = Math.round(monthPay).toLocaleString() + ' 元';
+  document.getElementById('totalIntText').innerText = Math.round(totalInterest).toLocaleString() + ' 元';
+  document.getElementById('totalPayText').innerText = Math.round(P + totalInterest).toLocaleString() + ' 元';
 
   const tbody = document.getElementById('scheduleBody');
   tbody.innerHTML = "";
@@ -472,10 +473,10 @@ function addRow(tbody,r){
   tr.innerHTML = `
     <td>${r.period}</td>
     <td>${r.date}</td>
-    <td>${(r.monthPay/10000).toFixed(2)}</td>
-    <td>${(r.pri/10000).toFixed(2)}</td>
-    <td>${(r.int/10000).toFixed(2)}</td>
-    <td>${(r.bal/10000).toFixed(2)}</td>
+    <td>${Math.round(r.monthPay).toLocaleString()}</td>
+    <td>${Math.round(r.pri).toLocaleString()}</td>
+    <td>${Math.round(r.int).toLocaleString()}</td>
+    <td>${Math.round(r.bal).toLocaleString()}</td>
   `;
   tbody.appendChild(tr);
 }
@@ -514,10 +515,10 @@ function calcBatch(){
 
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td>${current.toLocaleString()}</td>
-      <td>${(monthPay/10000).toFixed(2)}</td>
-      <td>${(totalInt/10000).toFixed(2)}</td>
-      <td>${(totalPay/10000).toFixed(2)}</td>
+      <td>${P.toLocaleString()}</td>
+      <td>${Math.round(monthPay).toLocaleString()}</td>
+      <td>${Math.round(totalInt).toLocaleString()}</td>
+      <td>${Math.round(totalPay).toLocaleString()}</td>
     `;
     batchTbody.appendChild(tr);
     current += stepW;
