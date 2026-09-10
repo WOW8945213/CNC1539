@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
-<title>本息平均攤還試算</title>
+<title>本息平均攤還試算｜區間批量 / 單筆分開輸入</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 *{box-sizing:border-box;font-family: "Microsoft JhengHei", "Noto Sans TC", sans-serif;}
@@ -62,6 +62,16 @@ body{
   grid-template-columns:1fr 1fr;
   gap:12px;
 }
+.inline-row-2{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+.block-sep{
+  margin:24px 0;
+  border-top:1px solid #ddd;
+  padding-top:20px;
+}
 .btn-group{
   display:flex;
   gap:10px;
@@ -80,9 +90,34 @@ body{
   background:#ff6a00;
   color:#fff;
 }
+.btn-green{
+  background:#28a745;
+  color:#fff;
+}
 .btn-gray{
   background:#eeeeee;
   color:#333;
+}
+
+/*多筆試算列表*/
+.multi-list{
+  margin-top:20px;
+}
+.multi-list h4{
+  margin:0 0 10px 0;
+}
+#multiTable{
+  width:100%;
+  border-collapse:collapse;
+}
+#multiTable th,#multiTable td{
+  border:1px solid #ddd;
+  padding:8px;
+  text-align:center;
+  font-size:14px;
+}
+#multiTable th{
+  background:#f4f4f4;
 }
 
 /*試算結果區域*/
@@ -193,31 +228,84 @@ th{
     <!-- 輸入面板在上 -->
     <div class="left-panel">
       <h3>貸款試算設定</h3>
-      <div class="field">
-        <label>貸款金額（萬元）</label>
-        <input type="number" id="loanAmtWan">
-      </div>
-      <div class="field">
-        <label>貸款年數</label>
-        <input type="number" id="loanYear">
-      </div>
-      <div class="inline-row">
+
+      <!-- 單筆試算區塊 -->
+      <div>
+        <h4 style="margin:0 0 16px 0;color:#ff6a00;">單筆試算（產生攤還表、前8後8期）</h4>
         <div class="field">
-          <label>起始民國年</label>
-          <input type="number" id="rocY">
+          <label>貸款金額（萬元）</label>
+          <input type="number" id="singleLoanWan">
         </div>
         <div class="field">
-          <label>起始月份</label>
-          <input type="number" id="rocM">
+          <label>貸款年數</label>
+          <input type="number" id="singleLoanYear">
+        </div>
+        <div class="inline-row">
+          <div class="field">
+            <label>起始民國年</label>
+            <input type="number" id="rocY">
+          </div>
+          <div class="field">
+            <label>起始月份</label>
+            <input type="number" id="rocM">
+          </div>
+        </div>
+        <div class="field">
+          <label>年利率 %</label>
+          <input type="number" step="0.01" id="singleRate">
+        </div>
+        <div class="btn-group">
+          <button class="btn btn-orange" onclick="calcSingle()">單筆試算</button>
         </div>
       </div>
-      <div class="field">
-        <label>年利率 %</label>
-        <input type="number" step="0.01" id="rate">
+
+      <!-- 分隔線 -->
+      <div class="block-sep"></div>
+
+      <!-- 區間批量試算區塊 -->
+      <div>
+        <h4 style="margin:0 0 16px 0;color:#28a745;">區間批量試算（間距固定10萬）</h4>
+        <div class="field">
+          <label>貸款金額區間（萬元）｜起 / 迄</label>
+          <div class="inline-row-2">
+            <input type="number" id="rangeStartWan" placeholder="起始，如100">
+            <input type="number" id="rangeEndWan" placeholder="結束，如150">
+          </div>
+        </div>
+        <div class="field">
+          <label>貸款年數</label>
+          <input type="number" id="rangeLoanYear">
+        </div>
+        <div class="field">
+          <label>年利率 %</label>
+          <input type="number" step="0.01" id="rangeRate">
+        </div>
+        <div class="btn-group">
+          <button class="btn btn-green" onclick="batchRangeCalc()">區間批量產生</button>
+          <button class="btn btn-gray" onclick="clearAll()">全部清除</button>
+        </div>
       </div>
-      <div class="btn-group">
-        <button class="btn btn-orange" onclick="calc()">試算</button>
-        <button class="btn btn-gray" onclick="clearForm()">清除</button>
+
+      <!-- 多筆試算列表 -->
+      <div class="multi-list">
+        <h4>多筆金額試算清單</h4>
+        <table id="multiTable">
+          <thead>
+            <tr>
+              <th>貸款(萬)</th>
+              <th>年數</th>
+              <th>利率%</th>
+              <th>月繳</th>
+              <th>總利息</th>
+              <th>總繳款</th>
+              <th>移除</th>
+            </tr>
+          </thead>
+          <tbody id="multiTbody"></tbody>
+        </table>
+        <div class="btn-group" style="margin-top:12px;">
+          <button class="btn btn-gray" onclick="clearMulti()">清空多筆清單</button>
+        </div>
       </div>
     </div>
 
@@ -295,20 +383,13 @@ th{
 </div>
 
 <script>
-function calc(){
-  const wanVal = Number(document.getElementById("loanAmtWan").value);
-  const y = Number(document.getElementById("loanYear").value);
-  const apr = Number(document.getElementById("rate").value);
-  const rocY = Number(document.getElementById("rocY").value);
-  const rocM = Number(document.getElementById("rocM").value);
-  if(!wanVal || !y || !apr){
-    alert("請填寫貸款金額、年數、年利率");
-    return;
-  }
+let multiData = [];
+const FIX_STEP = 10; //固定間距10萬
+
+function calcCore(wanVal,y,apr){
   const principal = wanVal * 10000;
   const monthRate = apr /100 /12;
   const totalMonth = y * 12;
-  //本息平均攤還公式
   let monthPay;
   if(monthRate === 0){
     monthPay = principal / totalMonth;
@@ -316,14 +397,12 @@ function calc(){
     monthPay = principal * monthRate * Math.pow(1+monthRate, totalMonth) / (Math.pow(1+monthRate,totalMonth)-1);
   }
   monthPay = Math.round(monthPay);
-
   let balance = principal;
   let totalInterest = 0;
   let schedule = [];
   for(let i=0; i<totalMonth;i++){
     let interest = balance * monthRate;
     let capital = monthPay - interest;
-    //最後一期修正尾數
     if(i === totalMonth -1){
       capital = balance;
       interest = monthPay - capital;
@@ -340,41 +419,111 @@ function calc(){
   }
   totalInterest = Math.round(totalInterest);
   const totalPay = principal + totalInterest;
+  return {principal,monthPay,totalInterest,totalPay,schedule};
+}
 
+//單筆試算
+function calcSingle(){
+  const wanVal = Number(document.getElementById("singleLoanWan").value);
+  const y = Number(document.getElementById("singleLoanYear").value);
+  const apr = Number(document.getElementById("singleRate").value);
+  if(!wanVal || !y || !apr){
+    alert("請填寫單筆區：貸款金額、年數、年利率");
+    return;
+  }
+  const res = calcCore(wanVal,y,apr);
   //填入卡片
-  document.getElementById("cardLoan").innerText = principal.toLocaleString() + " 元";
-  document.getElementById("cardMonthPay").innerText = monthPay.toLocaleString() + " 元";
-  document.getElementById("cardTotalInt").innerText = totalInterest.toLocaleString() + " 元";
-  document.getElementById("cardTotalPay").innerText = totalPay.toLocaleString() + " 元";
+  document.getElementById("cardLoan").innerText = res.principal.toLocaleString() + " 元";
+  document.getElementById("cardMonthPay").innerText = res.monthPay.toLocaleString() + " 元";
+  document.getElementById("cardTotalInt").innerText = res.totalInterest.toLocaleString() + " 元";
+  document.getElementById("cardTotalPay").innerText = res.totalPay.toLocaleString() + " 元";
 
   //前8期
   const frontTbody = document.getElementById("tableFront8");
   frontTbody.innerHTML = "";
   for(let i=0;i<8;i++){
-    const r = schedule[i];
+    const r = res.schedule[i];
     const tr = document.createElement("tr");
     tr.innerHTML = `<td>${r.period}</td><td>${r.pay.toLocaleString()}</td><td>${r.interest.toLocaleString()}</td><td>${r.capital.toLocaleString()}</td><td>${r.remain.toLocaleString()}</td>`;
     frontTbody.appendChild(tr);
   }
   //後8期
+  const totalMonth = y*12;
   const backStart = totalMonth - 8;
   document.getElementById("backTitle").innerText = `${backStart+1}～${totalMonth}期`;
   const backTbody = document.getElementById("tableBack8");
   backTbody.innerHTML = "";
   for(let i=backStart; i<totalMonth;i++){
-    const r = schedule[i];
+    const r = res.schedule[i];
     const tr = document.createElement("tr");
     tr.innerHTML = `<td>${r.period}</td><td>${r.pay.toLocaleString()}</td><td>${r.interest.toLocaleString()}</td><td>${r.capital.toLocaleString()}</td><td>${r.remain.toLocaleString()}</td>`;
     backTbody.appendChild(tr);
   }
   document.getElementById("resultWrap").style.display = "flex";
 }
-function clearForm(){
-  document.getElementById("loanAmtWan").value = "";
-  document.getElementById("loanYear").value = "";
+
+//區間批量試算
+function batchRangeCalc(){
+  const start = Number(document.getElementById("rangeStartWan").value);
+  const end = Number(document.getElementById("rangeEndWan").value);
+  const y = Number(document.getElementById("rangeLoanYear").value);
+  const apr = Number(document.getElementById("rangeRate").value);
+  if(!start || !end || !y || !apr){
+    alert("請填寫區間區：起始金額、結束金額、年數、利率");
+    return;
+  }
+  if(start>end){
+    alert("起始金額不能大於結束金額");
+    return;
+  }
+  //固定間距10萬
+  for(let amt=start; amt<=end; amt+=FIX_STEP){
+    const res = calcCore(amt,y,apr);
+    multiData.push({wanVal:amt,y,apr,monthPay:res.monthPay,totalInterest:res.totalInterest,totalPay:res.totalPay});
+  }
+  renderMultiTable();
+}
+
+function renderMultiTable(){
+  const tbody = document.getElementById("multiTbody");
+  tbody.innerHTML="";
+  multiData.forEach((item,idx)=>{
+    const tr = document.createElement("tr");
+    tr.innerHTML=`
+      <td>${item.wanVal}</td>
+      <td>${item.y}</td>
+      <td>${item.apr}</td>
+      <td>${item.monthPay.toLocaleString()}</td>
+      <td>${item.totalInterest.toLocaleString()}</td>
+      <td>${item.totalPay.toLocaleString()}</td>
+      <td><button onclick="delItem(${idx})">刪除</button></td>
+    `;
+    tbody.appendChild(tr);
+  })
+}
+function delItem(idx){
+  multiData.splice(idx,1);
+  renderMultiTable();
+}
+function clearMulti(){
+  multiData=[];
+  renderMultiTable();
+}
+function clearAll(){
+  //清空單筆
+  document.getElementById("singleLoanWan").value = "";
+  document.getElementById("singleLoanYear").value = "";
   document.getElementById("rocY").value = "";
   document.getElementById("rocM").value = "";
-  document.getElementById("rate").value = "";
+  document.getElementById("singleRate").value = "";
+  //清空區間
+  document.getElementById("rangeStartWan").value = "";
+  document.getElementById("rangeEndWan").value = "";
+  document.getElementById("rangeLoanYear").value = "";
+  document.getElementById("rangeRate").value = "";
+  //清結果與清單
+  multiData=[];
+  renderMultiTable();
   document.getElementById("resultWrap").style.display = "none";
 }
 </script>
