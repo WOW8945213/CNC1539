@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<title>本息平均攤還試算</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232767ad'/%3E%3Ctext x='32' y='44' font-size='30' text-anchor='middle' fill='white' font-family='sans-serif'%3E貸%3C/text%3E%3C/svg%3E">
+<style>
+*{box-sizing:border-box;font-family: "Microsoft JhengHei",sans-serif;}
+body{padding:10px;background:#fff;margin:0;}
+.wrap{max-width:720px;margin:0 auto;border:1px solid #337ab7;}
+.title-bar{background:#2767ad;color:#fff;padding:8px;text-align:center;font-size:18px;font-weight:bold;}
+
+/* ===== 版本切換 ===== */
+.vt-toggle{display:flex;border-bottom:1px solid #337ab7;background:#f4f8ff;}
+.vt-btn{flex:1;padding:8px 0;border:none;background:transparent;font-size:14px;cursor:pointer;color:#2767ad;font-family:inherit;}
+.vt-btn.active{background:#2767ad;color:#fff;font-weight:bold;}
+
+.input-area{background:#e8f2ff;padding:10px;}
+.input-row{display:flex;align-items:center;margin:6px 0;gap:6px;}
+.input-row label{width:180px;padding:3px;font-size:14px;}
+.input-row input{padding:5px;font-size:14px;width:200px;}
+.input-row .unit{padding:0 3px;font-size:14px;}
+.inline-group{display:flex;gap:6px;align-items:center;}
+.inline-group input{width:90px;}
+.btn-group{text-align:center;margin:8px 0;}
+button{padding:5px 12px;font-size:14px;margin:0 3px;cursor:pointer;font-family:inherit;}
+
+#resultBlock{padding:8px;}
+h3{font-size:16px;margin:6px 0;}
+h4{font-size:14px;margin:6px 0;}
+.param-strip{display:none;} /* 僅手機版顯示參數列 */
+
+table{width:100%;border-collapse:collapse;margin-top:8px;}
+th{background:#2767ad;color:#fff;padding:6px;text-align:center;font-size:14px;}
+td{border:1px solid #ccc;padding:5px;text-align:center;font-size:13px;}
+.omit-row td{text-align:center;color:#333;background:#f4f8ff;font-size:13px;}
+
+.result-summary{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;margin:8px 0;gap:6px;}
+.sum-card{border:1px solid #ccc;padding:4px 2px;text-align:center;}
+.sum-card div{font-size:23px;}
+.sum-card .big-red{font-size:24px;color:red;font-weight:bold;margin-top:4px;white-space:nowrap;}
+
+.result-actions{display:none;} /* 手機版才顯示：返回修改／列印 */
+
+/* ========== 手機版（iPhone XR 414×896 一頁顯示） ========== */
+body[data-mode="mobile"]{padding:0;}
+body[data-mode="mobile"] .wrap{max-width:414px;border:none;}
+body[data-mode="mobile"] .title-bar{font-size:16px;padding:10px 8px;}
+body[data-mode="mobile"] .vt-btn{font-size:15px;padding:10px 0;}
+body[data-mode="mobile"] .input-area{padding:10px;}
+body[data-mode="mobile"] .input-row{margin:8px 0;gap:6px;}
+body[data-mode="mobile"] .input-row label{width:150px;font-size:14px;}
+body[data-mode="mobile"] .input-row input{width:180px;font-size:16px;padding:6px;}
+body[data-mode="mobile"] .inline-group input{width:82px;}
+body[data-mode="mobile"] button{padding:8px 14px;font-size:15px;min-height:40px;}
+
+body[data-mode="mobile"] #resultBlock{padding:8px 10px 10px;}
+body[data-mode="mobile"] h3{font-size:18px;margin:2px 0 8px;text-align:center;}
+body[data-mode="mobile"] h4{font-size:14px;margin:10px 0 4px;}
+body[data-mode="mobile"] .param-strip{display:flex;flex-wrap:wrap;gap:3px 16px;background:#e8f2ff;border:1px solid #cfe0f7;border-radius:6px;padding:8px 10px;font-size:13px;line-height:1.55;}
+body[data-mode="mobile"] .param-strip b{color:#2767ad;}
+body[data-mode="mobile"] .result-summary{grid-template-columns:1fr 1fr;gap:9px;margin:10px 0 0;}
+body[data-mode="mobile"] .sum-card{padding:12px 4px;}
+body[data-mode="mobile"] .sum-card div{font-size:13px;}
+body[data-mode="mobile"] .sum-card .big-red{font-size:25px;margin-top:4px;}
+body[data-mode="mobile"] table{table-layout:fixed;margin-top:6px;}
+body[data-mode="mobile"] th{padding:6px 2px;font-size:12px;}
+body[data-mode="mobile"] td{padding:5px 2px;font-size:12px;}
+body[data-mode="mobile"] th:nth-child(1){width:9%;}
+body[data-mode="mobile"] th:nth-child(2){width:14%;}
+body[data-mode="mobile"] th:nth-child(3){width:15%;}
+body[data-mode="mobile"] th:nth-child(4){width:15%;}
+body[data-mode="mobile"] th:nth-child(5){width:15%;}
+body[data-mode="mobile"] th:nth-child(6){width:32%;}
+body[data-mode="mobile"] .omit-row td{font-size:12px;padding:5px 2px;}
+body[data-mode="mobile"] .result-actions{display:flex;gap:10px;margin-top:10px;}
+body[data-mode="mobile"] .result-actions button{flex:1;margin:0;}
+
+/* ========== 列印專用CSS ========== */
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    #resultBlock, #resultBlock * {
+        visibility: visible;
+    }
+    #resultBlock {
+        position: absolute;
+        left:0;
+        top:0;
+        width:100%;
+        border:none;
+    }
+    .btn-group, .vt-toggle, button {
+        display: none !important;
+    }
+}
+</style>
+</head>
+<body data-mode="web">
+<div class="wrap">
+  <div class="title-bar">本息平均攤還試算</div>
+  <div class="vt-toggle">
+    <button type="button" class="vt-btn active" data-mode="web" onclick="setMode('web')">網頁版</button>
+    <button type="button" class="vt-btn" data-mode="mobile" onclick="setMode('mobile')">手機版</button>
+  </div>
+  <div class="input-area">
+    <div class="input-row">
+      <label>您的貸款金額是：</label>
+      <input type="number" id="principal" value="">
+      <span class="unit">萬</span>
+    </div>
+    <div class="input-row">
+      <label>貸款年數：</label>
+      <input type="number" id="loanYear" value="">
+      <span class="unit">年</span>
+    </div>
+    <div class="input-row">
+      <label>貸款起始(民國)年月：</label>
+      <div class="inline-group">
+        <input type="number" id="rocYear" value="">
+        <span class="unit">年</span>
+        <input type="number" id="rocMonth" value="">
+        <span class="unit">月</span>
+      </div>
+    </div>
+    <div class="input-row">
+      <label>年利率：</label>
+      <input type="number" step="0.01" id="annualRate" value="">
+      <span class="unit">%</span>
+    </div>
+    <div class="btn-group">
+      <button onclick="calc()">試算</button>
+      <button onclick="clearAll()">清除</button>
+      <button onclick="printResult()">列印</button>
+    </div>
+  </div>
+  <div id="resultBlock" style="display:none;">
+    <h3>單筆試算結果</h3>
+    <div class="param-strip" id="paramStrip"></div>
+    <h4 id="detailTitle">還款明細表（僅顯示前8期與後8期，中間期數省略）</h4>
+    <table>
+      <thead>
+        <tr>
+          <th>期數</th>
+          <th>繳款日期</th>
+          <th>每月應繳</th>
+          <th>本金</th>
+          <th>利息</th>
+          <th>剩餘本金</th>
+        </tr>
+      </thead>
+      <tbody id="scheduleBody"></tbody>
+    </table>
+    <div class="result-summary" style="margin-top:10px;">
+      <div class="sum-card">
+        <div>每月應繳金額</div>
+        <div class="big-red" id="monthPayText"></div>
+      </div>
+      <div class="sum-card">
+        <div>貸款本金</div>
+        <div class="big-red" id="priText"></div>
+      </div>
+      <div class="sum-card">
+        <div>總利息金額</div>
+        <div class="big-red" id="totalIntText"></div>
+      </div>
+      <div class="sum-card">
+        <div>總繳款金額</div>
+        <div class="big-red" id="totalPayText"></div>
+      </div>
+    </div>
+    <div class="result-actions">
+      <button onclick="backToInput()">返回修改</button>
+      <button onclick="printResult()">列印</button>
+    </div>
+  </div>
+</div>
+<script>
+// 儲存最近一次試算結果，供版本切換時重新渲染
+let lastCalc = null;
+
+// 切換版本：web / mobile
+function setMode(mode){
+  document.body.dataset.mode = mode;
+  document.querySelectorAll('.vt-btn').forEach(function(b){
+    b.classList.toggle('active', b.dataset.mode === mode);
+  });
+  if(lastCalc){
+    renderResult();
+  }else{
+    backToInput();
+  }
+}
+
+// 單筆試算
+function calc(){
+  const PWan = Number(document.getElementById('principal').value);
+  const year = Number(document.getElementById('loanYear').value);
+  const apr = Number(document.getElementById('annualRate').value);
+  const rocY = Number(document.getElementById('rocYear').value);
+  const rocM = Number(document.getElementById('rocMonth').value);
+  if(!PWan||!year||!apr||!rocY||!rocM){
+    alert("請填寫完整欄位");
+    return;
+  }
+  const P = PWan * 10000; //輸入萬，轉元計算
+  const i = apr / 100 / 12;
+  const n = year * 12;
+  let payRate;
+  if(Math.abs(i)<1e-12){
+    payRate = 1 / n;
+  }else{
+    payRate = ( Math.pow(1+i,n) * i ) / ( Math.pow(1+i,n) - 1 );
+  }
+  const monthPay = P * payRate;
+  let balance = P;
+  let totalInterest = 0;
+  const rows = [];
+  let cy = rocY;
+  let cm = rocM;
+  for(let k=1;k<=n;k++){
+    let intMonth = balance * i;
+    let priMonth = monthPay - intMonth;
+    if(k === n){
+      priMonth = balance;
+      intMonth = monthPay - priMonth;
+    }
+    balance = balance - priMonth;
+    totalInterest += intMonth;
+    //民國日期
+    let dateStr = cy + '/' + String(cm).padStart(2,'0');
+    rows.push({
+      period:k,
+      date:dateStr,
+      monthPay:monthPay,
+      pri:priMonth,
+      int:intMonth,
+      bal:balance
+    })
+    cm++;
+    if(cm>12){
+      cm=1;
+      cy++;
+    }
+  }
+  lastCalc = { PWan: PWan, year: year, apr: apr, rocY: rocY, rocM: rocM, P: P, monthPay: monthPay, totalInterest: totalInterest, rows: rows };
+  renderResult();
+}
+
+// 依目前版本重新渲染結果
+function renderResult(){
+  if(!lastCalc) return;
+  const d = lastCalc;
+  const isMobile = document.body.dataset.mode === 'mobile';
+
+  // 參數列（手機版）
+  document.getElementById('paramStrip').innerHTML =
+    '<span>貸款金額 <b>' + d.PWan.toLocaleString() + ' 萬</b></span>' +
+    '<span>年數 <b>' + d.year + ' 年</b></span>' +
+    '<span>年利率 <b>' + d.apr + '%</b></span>' +
+    '<span>起算 <b>' + d.rocY + '/' + String(d.rocM).padStart(2,'0') + '</b></span>';
+
+  //摘要：貸款本金顯示萬，其餘維持元
+  document.getElementById('monthPayText').innerText = Math.round(d.monthPay).toLocaleString() + ' 元';
+  document.getElementById('priText').innerText = d.PWan.toLocaleString() + ' 萬';
+  document.getElementById('totalPayText').innerText = Math.round(d.P + d.totalInterest).toLocaleString() + ' 元';
+  document.getElementById('totalIntText').innerText = Math.round(d.totalInterest).toLocaleString() + ' 元';
+
+  //表格：手機版前6後6，網頁版前8後8
+  const front = isMobile ? 6 : 8;
+  const back = isMobile ? 6 : 8;
+  document.getElementById('detailTitle').innerText = '還款明細表（僅顯示前' + front + '期與後' + back + '期，中間期數省略）';
+
+  const tbody = document.getElementById('scheduleBody');
+  tbody.innerHTML = "";
+  d.rows.slice(0, front).forEach(function(r){ addRow(tbody, r); });
+  const omitTr = document.createElement('tr');
+  omitTr.className = "omit-row";
+  omitTr.innerHTML = '<td colspan="6">……中間期數省略……</td>';
+  tbody.appendChild(omitTr);
+  d.rows.slice(-back).forEach(function(r){ addRow(tbody, r); });
+
+  //顯示結果；手機版收起輸入區以整頁顯示
+  const ia = document.querySelector('.input-area');
+  const rb = document.getElementById('resultBlock');
+  rb.style.display = "block";
+  ia.style.display = isMobile ? "none" : "block";
+  window.scrollTo(0,0);
+}
+
+function addRow(tbody,r){
+  const tr = document.createElement('tr');
+  tr.innerHTML = '' +
+    '<td>' + r.period + '</td>' +
+    '<td>' + r.date + '</td>' +
+    '<td>' + Math.round(r.monthPay).toLocaleString() + '</td>' +
+    '<td>' + Math.round(r.pri).toLocaleString() + '</td>' +
+    '<td>' + Math.round(r.int).toLocaleString() + '</td>' +
+    '<td>' + Math.round(r.bal).toLocaleString() + '</td>';
+  tbody.appendChild(tr);
+}
+
+// 手機版：從結果頁返回修改
+function backToInput(){
+  lastCalc = null;
+  document.querySelector('.input-area').style.display = "block";
+  document.getElementById('resultBlock').style.display = "none";
+  window.scrollTo(0,0);
+}
+
+// 清除全部欄位與結果
+function clearAll(){
+  document.getElementById('principal').value='';
+  document.getElementById('loanYear').value='';
+  document.getElementById('rocYear').value='';
+  document.getElementById('rocMonth').value='';
+  document.getElementById('annualRate').value='';
+  lastCalc = null;
+  document.querySelector('.input-area').style.display = "block";
+  document.getElementById('resultBlock').style.display="none";
+}
+
+// 列印功能
+function printResult(){
+  if(document.getElementById('resultBlock').style.display === "none"){
+    alert("請先執行試算，才能列印！");
+    return;
+  }
+  window.print();
+}
+</script>
+</body>
+</html>
