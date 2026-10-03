@@ -8,81 +8,81 @@
 *{box-sizing:border-box;font-family: "Microsoft JhengHei", "Noto Sans TC", sans-serif;}
 body{
   margin:0;
-  padding:24px;
+  padding:12px;
   background:#f8f8f8;
   color:#333;
 }
 .container{
-  max-width:1600px;
+  max-width:1200px;
   margin:0 auto;
 }
 .wrap{
   display:flex;
   flex-direction:column;
-  gap:24px;
+  gap:16px;
 }
-/*輸入面板*/
+/*輸入面板 XR 尺寸縮減，適合截圖*/
 .left-panel{
   background:#ffffff;
-  border-radius:14px;
-  padding:22px;
-  box-shadow:0 2px 12px rgba(0,0,0,0.06);
+  border-radius:10px;
+  padding:16px;
+  box-shadow:0 2px 10px rgba(0,0,0,0.06);
   height:fit-content;
 }
 .left-panel h3{
-  font-size:18px;
-  margin:0 0 20px 0;
+  font-size:16px;
+  margin:0 0 14px 0;
   color:#ff6a00;
   display:flex;
   align-items:center;
-  gap:8px;
+  gap:6px;
 }
 .left-panel h3::before{
   content:"";
-  width:5px;height:18px;background:#ff6a00;border-radius:2px;
+  width:4px;height:14px;background:#ff6a00;border-radius:2px;
 }
 .field{
-  margin-bottom:16px;
+  margin-bottom:10px;
 }
 .field label{
   display:block;
-  font-size:14px;
+  font-size:13px;
   color:#555;
-  margin-bottom:6px;
+  margin-bottom:4px;
 }
 .field input{
   width:100%;
-  padding:11px 14px;
+  padding:8px 10px;
   border:1px solid #ddd;
-  border-radius:8px;
-  font-size:16px;
+  border-radius:6px;
+  font-size:14px;
 }
 .inline-row{
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:12px;
+  gap:10px;
 }
 .inline-row-2{
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:12px;
+  gap:10px;
 }
 .block-sep{
-  margin:24px 0;
+  margin:16px 0;
   border-top:1px solid #ddd;
-  padding-top:20px;
+  padding-top:14px;
 }
 .btn-group{
   display:flex;
-  gap:10px;
-  margin-top:20px;
+  gap:8px;
+  margin-top:14px;
 }
 .btn{
   flex:1;
-  padding:12px;
+  padding:9px;
   border:none;
-  border-radius:8px;
-  font-size:15px;
+  border-radius:6px;
+  font-size:14px;
   font-weight:bold;
   cursor:pointer;
 }
@@ -98,13 +98,13 @@ body{
   background:#eeeeee;
   color:#333;
 }
-
-/*多筆試算列表*/
+/*多筆試算列表 緊縮排版，XR截圖不放大可讀*/
 .multi-list{
-  margin-top:20px;
+  margin-top:14px;
 }
 .multi-list h4{
-  margin:0 0 10px 0;
+  margin:0 0 8px 0;
+  font-size:14px;
 }
 #multiTable{
   width:100%;
@@ -112,98 +112,96 @@ body{
 }
 #multiTable th,#multiTable td{
   border:1px solid #ddd;
-  padding:8px;
+  padding:5px;
   text-align:center;
-  font-size:14px;
+  font-size:12px;
 }
 #multiTable th{
   background:#f4f4f4;
 }
-
 /*試算結果區域*/
 .right-area{
   display:flex;
   flex-direction:column;
-  gap:20px;
+  gap:14px;
 }
 .result-header-bar{
   background:linear-gradient(90deg,#ff781f,#ff6300);
   color:#fff;
-  padding:14px 20px;
-  border-radius:12px;
-  font-size:20px;
+  padding:10px 14px;
+  border-radius:8px;
+  font-size:16px;
   font-weight:bold;
 }
 .summary-row{
   display:grid;
   grid-template-columns: repeat(4, 1fr);
-  gap:16px;
+  gap:10px;
 }
 .sum-card{
   background:#fff8ef;
-  border-radius:12px;
-  padding:24px 20px;
+  border-radius:8px;
+  padding:14px 10px;
 }
 .sum-card.orange{
   background:#ff6a00;
   color:#fff;
 }
 .sum-card .title{
-  font-size:15px;
+  font-size:13px;
   color:#666;
-  margin-bottom:10px;
+  margin-bottom:6px;
   display:flex;
   align-items:center;
-  gap:6px;
+  gap:4px;
 }
 .sum-card.orange .title{color:#fff;}
 .sum-card .num{
-  font-size:34px;
+  font-size:24px;
   font-weight:bold;
   white-space:nowrap;
 }
 .sum-card.orange .num{color:#fff;}
-
 /*還款明細*/
 .detail-wrap{
   background:#fff;
-  border-radius:12px;
-  padding:20px;
+  border-radius:8px;
+  padding:14px;
 }
 .detail-top-bar{
   display:flex;
   justify-content:space-between;
   align-items:center;
-  margin-bottom:16px;
+  margin-bottom:12px;
 }
 .detail-title{
-  font-size:18px;
+  font-size:16px;
   font-weight:bold;
-  display:flex;align-items:center;gap:8px;
+  display:flex;align-items:center;gap:6px;
 }
 .btns-right{
-  display:flex;gap:10px;
+  display:flex;gap:8px;
 }
 .btn-excel{
-  background:#28a745;color:#fff;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-weight:bold;
+  background:#28a745;color:#fff;border:none;padding:6px 12px;border-radius:5px;cursor:pointer;font-weight:bold;font-size:13px;
 }
 .btn-pdf{
-  background:#dc3545;color:#fff;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-weight:bold;
+  background:#dc3545;color:#fff;border:none;padding:6px 12px;border-radius:5px;cursor:pointer;font-weight:bold;font-size:13px;
 }
-/*前8、後8表格平行並列*/
+/*前8、後8表格平行並列，字體縮小適合XR截圖*/
 .two-table-row{
   display:grid;
   grid-template-columns: 1fr 1fr;
-  gap:20px;
+  gap:12px;
 }
 .table-block{
   background:#fff8ef;
-  border-radius:10px;
-  padding:16px;
+  border-radius:8px;
+  padding:12px;
 }
 .table-block h4{
-  margin:0 0 12px 0;
-  font-size:16px;
+  margin:0 0 8px 0;
+  font-size:14px;
 }
 table{
   width:100%;
@@ -211,8 +209,8 @@ table{
 }
 th,td{
   text-align:center;
-  padding:8px 4px;
-  font-size:14px;
+  padding:5px 3px;
+  font-size:12px;
   border:1px solid #ddd;
 }
 th{
@@ -228,10 +226,9 @@ th{
     <!-- 輸入面板在上 -->
     <div class="left-panel">
       <h3>貸款試算設定</h3>
-
       <!-- 單筆試算區塊 -->
       <div>
-        <h4 style="margin:0 0 16px 0;color:#ff6a00;">單筆試算（產生攤還表、前8後8期）</h4>
+        <h4 style="margin:0 0 12px 0;color:#ff6a00;font-size:14px;">單筆試算（產生攤還表、前8後8期）</h4>
         <div class="field">
           <label>貸款金額（萬元）</label>
           <input type="number" id="singleLoanWan">
@@ -258,13 +255,11 @@ th{
           <button class="btn btn-orange" onclick="calcSingle()">單筆試算</button>
         </div>
       </div>
-
       <!-- 分隔線 -->
       <div class="block-sep"></div>
-
       <!-- 區間批量試算區塊 -->
       <div>
-        <h4 style="margin:0 0 16px 0;color:#28a745;">多筆金額試算</h4>
+        <h4 style="margin:0 0 12px 0;color:#28a745;font-size:14px;">多筆金額試算</h4>
         <div class="field">
           <label>貸款金額區間（萬元）｜起 / 迄</label>
           <div class="inline-row-2">
@@ -285,7 +280,6 @@ th{
           <button class="btn btn-gray" onclick="clearAll()">全部清除</button>
         </div>
       </div>
-
       <!-- 多筆試算列表 -->
       <div class="multi-list">
         <h4>多筆金額試算清單</h4>
@@ -303,12 +297,11 @@ th{
           </thead>
           <tbody id="multiTbody"></tbody>
         </table>
-        <div class="btn-group" style="margin-top:12px;">
+        <div class="btn-group" style="margin-top:10px;">
           <button class="btn btn-gray" onclick="clearMulti()">清空多筆清單</button>
         </div>
       </div>
     </div>
-
     <!-- 試算結果在下方，垂直排列 -->
     <div class="right-area" id="resultWrap" style="display:none;">
       <div class="result-header-bar">
@@ -381,11 +374,9 @@ th{
     </div>
   </div>
 </div>
-
 <script>
 let multiData = [];
 const FIX_STEP = 10; //固定間距10萬
-
 function calcCore(wanVal,y,apr){
   const principal = wanVal * 10000;
   const monthRate = apr /100 /12;
@@ -421,7 +412,6 @@ function calcCore(wanVal,y,apr){
   const totalPay = principal + totalInterest;
   return {principal,monthPay,totalInterest,totalPay,schedule};
 }
-
 //單筆試算
 function calcSingle(){
   const wanVal = Number(document.getElementById("singleLoanWan").value);
@@ -437,7 +427,6 @@ function calcSingle(){
   document.getElementById("cardMonthPay").innerText = res.monthPay.toLocaleString() + " 元";
   document.getElementById("cardTotalInt").innerText = res.totalInterest.toLocaleString() + " 元";
   document.getElementById("cardTotalPay").innerText = res.totalPay.toLocaleString() + " 元";
-
   //前8期
   const frontTbody = document.getElementById("tableFront8");
   frontTbody.innerHTML = "";
@@ -461,7 +450,6 @@ function calcSingle(){
   }
   document.getElementById("resultWrap").style.display = "flex";
 }
-
 //區間批量試算
 function batchRangeCalc(){
   const start = Number(document.getElementById("rangeStartWan").value);
@@ -483,7 +471,6 @@ function batchRangeCalc(){
   }
   renderMultiTable();
 }
-
 function renderMultiTable(){
   const tbody = document.getElementById("multiTbody");
   tbody.innerHTML="";
