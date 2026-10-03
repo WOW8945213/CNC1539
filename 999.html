@@ -7,15 +7,15 @@
 <style>
 *{box-sizing:border-box;font-family:"Microsoft JhengHei","Noto Sans TC",sans-serif;margin:0;padding:0;}
 body{
-  background:#f7f8fa;
-  color:#333;
+  background:#ffffff;
+  color:#1a1a1a;
   padding:16px;
 }
 .page-title{
   width:100%;
   max-width:760px;
   margin:0 auto 12px;
-  background:linear-gradient(90deg,#1f4e79,#2e75b6);
+  background:#0066FF;
   color:#fff;
   font-size:15px;
   font-weight:bold;
@@ -27,7 +27,7 @@ body{
   max-width:760px;
   margin:0 auto;
   background:#fff;
-  border:1px solid #dce1e6;
+  border:1px solid #d6e4ff;
   border-radius:0 0 6px 6px;
   padding:14px;
 }
@@ -37,14 +37,14 @@ body{
   gap:12px;
 }
 .left-panel{
-  background:#fafcff;
-  border:1px solid #e4e9f0;
+  background:#ffffff;
+  border:1px solid #d6e4ff;
   border-radius:6px;
   padding:12px;
 }
 .left-panel h3{
   font-size:14px;
-  color:#1f4e79;
+  color:#0066FF;
   margin-bottom:10px;
   display:flex;
   align-items:center;
@@ -54,32 +54,37 @@ body{
   content:"";
   width:4px;
   height:13px;
-  background:#2e75b6;
+  background:#0066FF;
   border-radius:2px;
 }
 .sub-title{
   font-size:13px;
   font-weight:bold;
   margin-bottom:8px;
+  color:#0066FF;
 }
-.sub-title.orange{color:#ff6a00;}
-.sub-title.green{color:#28a745;}
 .field{
   margin-bottom:8px;
 }
 .field label{
   display:block;
   font-size:12px;
-  color:#555;
+  color:#333;
   margin-bottom:3px;
 }
 .field input{
   width:100%;
   padding:6px 8px;
-  border:1px solid #cfd6de;
+  border:1px solid #b3d4ff;
   border-radius:4px;
   font-size:13px;
   background:#fff;
+  color:#1a1a1a;
+}
+.field input:focus{
+  outline:none;
+  border-color:#0066FF;
+  box-shadow:0 0 0 2px rgba(0,102,255,.15);
 }
 .inline-row,
 .inline-row-2{
@@ -89,7 +94,7 @@ body{
 }
 .block-sep{
   margin:14px 0;
-  border-top:1px dashed #d0d7de;
+  border-top:1px dashed #d6e4ff;
 }
 .btn-group{
   display:flex;
@@ -105,17 +110,35 @@ body{
   font-weight:bold;
   cursor:pointer;
   color:#fff;
+  transition:background .2s;
 }
-.btn-orange{background:#ff6a00;}
-.btn-green{background:#28a745;}
-.btn-gray{background:#6c757d;color:#fff;}
+.btn-blue-main{
+  background:#0066FF;
+}
+.btn-blue-main:hover{
+  background:#0052cc;
+}
+.btn-blue-light{
+  background:#4d94ff;
+}
+.btn-blue-light:hover{
+  background:#3385ff;
+}
+.btn-gray-pale{
+  background:#f0f4fa;
+  color:#0066FF;
+  border:1px solid #d6e4ff;
+}
+.btn-gray-pale:hover{
+  background:#e6f0ff;
+}
 .multi-list{
   margin-top:12px;
 }
 .multi-list h4{
   font-size:13px;
   margin-bottom:8px;
-  color:#333;
+  color:#0066FF;
 }
 #multiTable{
   width:100%;
@@ -124,14 +147,15 @@ body{
 }
 #multiTable th,
 #multiTable td{
-  border:1px solid #d0d7de;
+  border:1px solid #d6e4ff;
   padding:4px 5px;
   text-align:center;
   font-size:12px;
+  color:#1a1a1a;
 }
 #multiTable th{
-  background:#eef4fb;
-  color:#333;
+  background:#f0f7ff;
+  color:#0066FF;
 }
 .right-area{
   display:none;
@@ -142,13 +166,14 @@ body{
   display:flex;
 }
 .result-header-bar{
-  background:#fff7e6;
-  border-left:4px solid #ff6a00;
+  background:#ffffff;
+  border-left:4px solid #0066FF;
   padding:9px 12px;
   border-radius:4px;
   font-size:14px;
   font-weight:bold;
-  color:#333;
+  color:#0066FF;
+  border:1px solid #d6e4ff;
 }
 .summary-row{
   display:grid;
@@ -156,33 +181,36 @@ body{
   gap:8px;
 }
 .sum-card{
-  background:#fafcff;
-  border:1px solid #e4e9f0;
+  background:#ffffff;
+  border:1px solid #d6e4ff;
   border-radius:5px;
   padding:10px 8px;
   text-align:center;
 }
 .sum-card .title{
   font-size:12px;
-  color:#666;
+  color:#333;
   margin-bottom:5px;
 }
 .sum-card .num{
   font-size:18px;
   font-weight:bold;
-  color:#333;
+  color:#1a1a1a;
   white-space:nowrap;
 }
-.sum-card.orange{
-  background:#fff3e0;
-  border-color:#ffd4a3;
+.sum-card.strong-card{
+  background:#0066FF;
+  border-color:#0066FF;
 }
-.sum-card.orange .num{
-  color:#e65100;
+.sum-card.strong-card .title{
+  color:#cce4ff;
+}
+.sum-card.strong-card .num{
+  color:#fff;
 }
 .detail-wrap{
-  background:#fafcff;
-  border:1px solid #e4e9f0;
+  background:#ffffff;
+  border:1px solid #d6e4ff;
   border-radius:6px;
   padding:12px;
 }
@@ -195,7 +223,7 @@ body{
 .detail-title{
   font-size:14px;
   font-weight:bold;
-  color:#333;
+  color:#0066FF;
 }
 .btns-right{
   display:flex;
@@ -211,37 +239,48 @@ body{
   cursor:pointer;
   color:#fff;
 }
-.btn-excel{background:#28a745;}
-.btn-pdf{background:#dc3545;}
+.btn-excel{
+  background:#4d94ff;
+}
+.btn-excel:hover{
+  background:#3385ff;
+}
+.btn-pdf{
+  background:#0066FF;
+}
+.btn-pdf:hover{
+  background:#0052cc;
+}
 .two-table-row{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:10px;
 }
 .table-block{
-  background:#fff;
-  border:1px solid #e4e9f0;
+  background:#ffffff;
+  border:1px solid #d6e4ff;
   border-radius:5px;
   padding:10px;
 }
 .table-block h4{
   font-size:13px;
   margin-bottom:8px;
-  color:#333;
+  color:#0066FF;
 }
 table{
   width:100%;
   border-collapse:collapse;
 }
 th,td{
-  border:1px solid #d0d7de;
+  border:1px solid #d6e4ff;
   padding:4px 3px;
   text-align:center;
   font-size:12px;
+  color:#1a1a1a;
 }
 th{
-  background:#eef4fb;
-  color:#333;
+  background:#f0f7ff;
+  color:#0066FF;
   font-weight:bold;
 }
 </style>
@@ -258,7 +297,7 @@ th{
       <h3>貸款試算設定</h3>
 
       <div>
-        <div class="sub-title orange">單筆試算</div>
+        <div class="sub-title">單筆試算</div>
 
         <div class="field">
           <label>貸款金額（萬元）</label>
@@ -287,14 +326,14 @@ th{
         </div>
 
         <div class="btn-group">
-          <button class="btn btn-orange" onclick="calcSingle()">單筆試算</button>
+          <button class="btn btn-blue-main" onclick="calcSingle()">單筆試算</button>
         </div>
       </div>
 
       <div class="block-sep"></div>
 
       <div>
-        <div class="sub-title green">多筆金額試算（固定間距10萬）</div>
+        <div class="sub-title">多筆金額試算（固定間距10萬）</div>
 
         <div class="field">
           <label>貸款金額區間（萬元）｜起 / 迄</label>
@@ -316,8 +355,8 @@ th{
         </div>
 
         <div class="btn-group">
-          <button class="btn btn-green" onclick="batchRangeCalc()">多筆金額試算</button>
-          <button class="btn btn-gray" onclick="clearAll()">全部清除</button>
+          <button class="btn btn-blue-light" onclick="batchRangeCalc()">多筆金額試算</button>
+          <button class="btn btn-gray-pale" onclick="clearAll()">全部清除</button>
         </div>
       </div>
 
@@ -340,7 +379,7 @@ th{
         </table>
 
         <div class="btn-group" style="margin-top:10px;">
-          <button class="btn btn-gray" onclick="clearMulti()">清空多筆清單</button>
+          <button class="btn btn-gray-pale" onclick="clearMulti()">清空多筆清單</button>
         </div>
       </div>
     </div>
@@ -362,7 +401,7 @@ th{
           <div class="title">總利息</div>
           <div class="num" id="cardTotalInt">0元</div>
         </div>
-        <div class="sum-card orange">
+        <div class="sum-card strong-card">
           <div class="title">總計繳款金額</div>
           <div class="num" id="cardTotalPay">0元</div>
         </div>
