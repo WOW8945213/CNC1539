@@ -5,238 +5,271 @@
 <title>本息平均攤還試算｜區間批量 / 單筆分開輸入</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-*{box-sizing:border-box;font-family: "Microsoft JhengHei", "Noto Sans TC", sans-serif;}
+*{box-sizing:border-box;font-family:"Microsoft JhengHei","Noto Sans TC",sans-serif;margin:0;padding:0;}
 body{
-  margin:0;
-  padding:12px;
-  background:#f8f8f8;
+  background:#f7f8fa;
   color:#333;
+  padding:16px;
+}
+.page-title{
+  width:100%;
+  max-width:760px;
+  margin:0 auto 12px;
+  background:linear-gradient(90deg,#1f4e79,#2e75b6);
+  color:#fff;
+  font-size:15px;
+  font-weight:bold;
+  text-align:center;
+  padding:8px 12px;
+  border-radius:6px 6px 0 0;
 }
 .container{
-  max-width:1200px;
+  max-width:760px;
   margin:0 auto;
+  background:#fff;
+  border:1px solid #dce1e6;
+  border-radius:0 0 6px 6px;
+  padding:14px;
 }
 .wrap{
   display:flex;
   flex-direction:column;
-  gap:16px;
+  gap:12px;
 }
-/*輸入面板 XR 尺寸縮減，適合截圖*/
 .left-panel{
-  background:#ffffff;
-  border-radius:10px;
-  padding:16px;
-  box-shadow:0 2px 10px rgba(0,0,0,0.06);
-  height:fit-content;
+  background:#fafcff;
+  border:1px solid #e4e9f0;
+  border-radius:6px;
+  padding:12px;
 }
 .left-panel h3{
-  font-size:16px;
-  margin:0 0 14px 0;
-  color:#ff6a00;
+  font-size:14px;
+  color:#1f4e79;
+  margin-bottom:10px;
   display:flex;
   align-items:center;
   gap:6px;
 }
 .left-panel h3::before{
   content:"";
-  width:4px;height:14px;background:#ff6a00;border-radius:2px;
+  width:4px;
+  height:13px;
+  background:#2e75b6;
+  border-radius:2px;
 }
+.sub-title{
+  font-size:13px;
+  font-weight:bold;
+  margin-bottom:8px;
+}
+.sub-title.orange{color:#ff6a00;}
+.sub-title.green{color:#28a745;}
 .field{
-  margin-bottom:10px;
+  margin-bottom:8px;
 }
 .field label{
   display:block;
-  font-size:13px;
+  font-size:12px;
   color:#555;
-  margin-bottom:4px;
+  margin-bottom:3px;
 }
 .field input{
   width:100%;
-  padding:8px 10px;
-  border:1px solid #ddd;
-  border-radius:6px;
-  font-size:14px;
+  padding:6px 8px;
+  border:1px solid #cfd6de;
+  border-radius:4px;
+  font-size:13px;
+  background:#fff;
 }
-.inline-row{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-}
+.inline-row,
 .inline-row-2{
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:10px;
+  gap:8px;
 }
 .block-sep{
-  margin:16px 0;
-  border-top:1px solid #ddd;
-  padding-top:14px;
+  margin:14px 0;
+  border-top:1px dashed #d0d7de;
 }
 .btn-group{
   display:flex;
   gap:8px;
-  margin-top:14px;
+  margin-top:10px;
 }
 .btn{
   flex:1;
-  padding:9px;
+  padding:7px 10px;
   border:none;
-  border-radius:6px;
-  font-size:14px;
+  border-radius:4px;
+  font-size:13px;
   font-weight:bold;
   cursor:pointer;
-}
-.btn-orange{
-  background:#ff6a00;
   color:#fff;
 }
-.btn-green{
-  background:#28a745;
-  color:#fff;
-}
-.btn-gray{
-  background:#eeeeee;
-  color:#333;
-}
-/*多筆試算列表 緊縮排版，XR截圖不放大可讀*/
+.btn-orange{background:#ff6a00;}
+.btn-green{background:#28a745;}
+.btn-gray{background:#6c757d;color:#fff;}
 .multi-list{
-  margin-top:14px;
+  margin-top:12px;
 }
 .multi-list h4{
-  margin:0 0 8px 0;
-  font-size:14px;
+  font-size:13px;
+  margin-bottom:8px;
+  color:#333;
 }
 #multiTable{
   width:100%;
   border-collapse:collapse;
+  background:#fff;
 }
-#multiTable th,#multiTable td{
-  border:1px solid #ddd;
-  padding:5px;
+#multiTable th,
+#multiTable td{
+  border:1px solid #d0d7de;
+  padding:4px 5px;
   text-align:center;
   font-size:12px;
 }
 #multiTable th{
-  background:#f4f4f4;
+  background:#eef4fb;
+  color:#333;
 }
-/*試算結果區域*/
 .right-area{
-  display:flex;
+  display:none;
   flex-direction:column;
-  gap:14px;
+  gap:12px;
+}
+.right-area.show{
+  display:flex;
 }
 .result-header-bar{
-  background:linear-gradient(90deg,#ff781f,#ff6300);
-  color:#fff;
-  padding:10px 14px;
-  border-radius:8px;
-  font-size:16px;
+  background:#fff7e6;
+  border-left:4px solid #ff6a00;
+  padding:9px 12px;
+  border-radius:4px;
+  font-size:14px;
   font-weight:bold;
+  color:#333;
 }
 .summary-row{
   display:grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap:10px;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
 }
 .sum-card{
-  background:#fff8ef;
-  border-radius:8px;
-  padding:14px 10px;
-}
-.sum-card.orange{
-  background:#ff6a00;
-  color:#fff;
+  background:#fafcff;
+  border:1px solid #e4e9f0;
+  border-radius:5px;
+  padding:10px 8px;
+  text-align:center;
 }
 .sum-card .title{
-  font-size:13px;
+  font-size:12px;
   color:#666;
-  margin-bottom:6px;
-  display:flex;
-  align-items:center;
-  gap:4px;
+  margin-bottom:5px;
 }
-.sum-card.orange .title{color:#fff;}
 .sum-card .num{
-  font-size:24px;
+  font-size:18px;
   font-weight:bold;
+  color:#333;
   white-space:nowrap;
 }
-.sum-card.orange .num{color:#fff;}
-/*還款明細*/
+.sum-card.orange{
+  background:#fff3e0;
+  border-color:#ffd4a3;
+}
+.sum-card.orange .num{
+  color:#e65100;
+}
 .detail-wrap{
-  background:#fff;
-  border-radius:8px;
-  padding:14px;
+  background:#fafcff;
+  border:1px solid #e4e9f0;
+  border-radius:6px;
+  padding:12px;
 }
 .detail-top-bar{
   display:flex;
   justify-content:space-between;
   align-items:center;
-  margin-bottom:12px;
+  margin-bottom:10px;
 }
 .detail-title{
-  font-size:16px;
+  font-size:14px;
   font-weight:bold;
-  display:flex;align-items:center;gap:6px;
+  color:#333;
 }
 .btns-right{
-  display:flex;gap:8px;
+  display:flex;
+  gap:6px;
 }
-.btn-excel{
-  background:#28a745;color:#fff;border:none;padding:6px 12px;border-radius:5px;cursor:pointer;font-weight:bold;font-size:13px;
-}
+.btn-excel,
 .btn-pdf{
-  background:#dc3545;color:#fff;border:none;padding:6px 12px;border-radius:5px;cursor:pointer;font-weight:bold;font-size:13px;
+  border:none;
+  border-radius:4px;
+  padding:5px 10px;
+  font-size:12px;
+  font-weight:bold;
+  cursor:pointer;
+  color:#fff;
 }
-/*前8、後8表格平行並列，字體縮小適合XR截圖*/
+.btn-excel{background:#28a745;}
+.btn-pdf{background:#dc3545;}
 .two-table-row{
   display:grid;
-  grid-template-columns: 1fr 1fr;
-  gap:12px;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
 }
 .table-block{
-  background:#fff8ef;
-  border-radius:8px;
-  padding:12px;
+  background:#fff;
+  border:1px solid #e4e9f0;
+  border-radius:5px;
+  padding:10px;
 }
 .table-block h4{
-  margin:0 0 8px 0;
-  font-size:14px;
+  font-size:13px;
+  margin-bottom:8px;
+  color:#333;
 }
 table{
   width:100%;
-  border-collapse: collapse;
+  border-collapse:collapse;
 }
 th,td{
+  border:1px solid #d0d7de;
+  padding:4px 3px;
   text-align:center;
-  padding:5px 3px;
   font-size:12px;
-  border:1px solid #ddd;
 }
 th{
-  background:#f4f4f4;
+  background:#eef4fb;
   color:#333;
   font-weight:bold;
 }
 </style>
 </head>
 <body>
+
+<div class="page-title">本息平均攤還試算</div>
+
 <div class="container">
   <div class="wrap">
-    <!-- 輸入面板在上 -->
+
+    <!-- 輸入面板 -->
     <div class="left-panel">
       <h3>貸款試算設定</h3>
-      <!-- 單筆試算區塊 -->
+
       <div>
-        <h4 style="margin:0 0 12px 0;color:#ff6a00;font-size:14px;">單筆試算（產生攤還表、前8後8期）</h4>
+        <div class="sub-title orange">單筆試算</div>
+
         <div class="field">
           <label>貸款金額（萬元）</label>
           <input type="number" id="singleLoanWan">
         </div>
+
         <div class="field">
           <label>貸款年數</label>
           <input type="number" id="singleLoanYear">
         </div>
+
         <div class="inline-row">
           <div class="field">
             <label>起始民國年</label>
@@ -247,19 +280,22 @@ th{
             <input type="number" id="rocM">
           </div>
         </div>
+
         <div class="field">
           <label>年利率 %</label>
           <input type="number" step="0.01" id="singleRate">
         </div>
+
         <div class="btn-group">
           <button class="btn btn-orange" onclick="calcSingle()">單筆試算</button>
         </div>
       </div>
-      <!-- 分隔線 -->
+
       <div class="block-sep"></div>
-      <!-- 區間批量試算區塊 -->
+
       <div>
-        <h4 style="margin:0 0 12px 0;color:#28a745;font-size:14px;">多筆金額試算</h4>
+        <div class="sub-title green">多筆金額試算（固定間距10萬）</div>
+
         <div class="field">
           <label>貸款金額區間（萬元）｜起 / 迄</label>
           <div class="inline-row-2">
@@ -267,20 +303,25 @@ th{
             <input type="number" id="rangeEndWan" placeholder="結束，如150">
           </div>
         </div>
-        <div class="field">
-          <label>貸款年數</label>
-          <input type="number" id="rangeLoanYear">
+
+        <div class="inline-row">
+          <div class="field">
+            <label>貸款年數</label>
+            <input type="number" id="rangeLoanYear">
+          </div>
+          <div class="field">
+            <label>年利率 %</label>
+            <input type="number" step="0.01" id="rangeRate">
+          </div>
         </div>
-        <div class="field">
-          <label>年利率 %</label>
-          <input type="number" step="0.01" id="rangeRate">
-        </div>
+
         <div class="btn-group">
           <button class="btn btn-green" onclick="batchRangeCalc()">多筆金額試算</button>
           <button class="btn btn-gray" onclick="clearAll()">全部清除</button>
         </div>
       </div>
-      <!-- 多筆試算列表 -->
+
+      <!-- 多筆清單 -->
       <div class="multi-list">
         <h4>多筆金額試算清單</h4>
         <table id="multiTable">
@@ -297,17 +338,17 @@ th{
           </thead>
           <tbody id="multiTbody"></tbody>
         </table>
+
         <div class="btn-group" style="margin-top:10px;">
           <button class="btn btn-gray" onclick="clearMulti()">清空多筆清單</button>
         </div>
       </div>
     </div>
-    <!-- 試算結果在下方，垂直排列 -->
-    <div class="right-area" id="resultWrap" style="display:none;">
-      <div class="result-header-bar">
-        試算結果摘要
-      </div>
-      <!--4個摘要卡片同一橫列-->
+
+    <!-- 試算結果 -->
+    <div class="right-area" id="resultWrap">
+      <div class="result-header-bar">試算結果摘要</div>
+
       <div class="summary-row">
         <div class="sum-card">
           <div class="title">貸款金額</div>
@@ -326,7 +367,7 @@ th{
           <div class="num" id="cardTotalPay">0元</div>
         </div>
       </div>
-      <!-- 還款明細 -->
+
       <div class="detail-wrap">
         <div class="detail-top-bar">
           <div class="detail-title">還款明細</div>
@@ -335,9 +376,8 @@ th{
             <button class="btn-pdf">PDF列印</button>
           </div>
         </div>
-        <!-- 兩個表格左右平行並列 -->
+
         <div class="two-table-row">
-          <!--前8期表格-->
           <div class="table-block">
             <h4>前8期（第1～8期）</h4>
             <table>
@@ -353,7 +393,7 @@ th{
               <tbody id="tableFront8"></tbody>
             </table>
           </div>
-          <!--後8期表格-->
+
           <div class="table-block">
             <h4>後8期（<span id="backTitle">77～84期</span>）</h4>
             <table>
@@ -372,111 +412,151 @@ th{
         </div>
       </div>
     </div>
+
   </div>
 </div>
+
 <script>
 let multiData = [];
-const FIX_STEP = 10; //固定間距10萬
-function calcCore(wanVal,y,apr){
+const FIX_STEP = 10;
+
+function calcCore(wanVal, y, apr) {
   const principal = wanVal * 10000;
-  const monthRate = apr /100 /12;
+  const monthRate = apr / 100 / 12;
   const totalMonth = y * 12;
   let monthPay;
-  if(monthRate === 0){
+
+  if (monthRate === 0) {
     monthPay = principal / totalMonth;
-  }else{
-    monthPay = principal * monthRate * Math.pow(1+monthRate, totalMonth) / (Math.pow(1+monthRate,totalMonth)-1);
+  } else {
+    monthPay = principal * monthRate * Math.pow(1 + monthRate, totalMonth) /
+               (Math.pow(1 + monthRate, totalMonth) - 1);
   }
+
   monthPay = Math.round(monthPay);
   let balance = principal;
   let totalInterest = 0;
   let schedule = [];
-  for(let i=0; i<totalMonth;i++){
+
+  for (let i = 0; i < totalMonth; i++) {
     let interest = balance * monthRate;
     let capital = monthPay - interest;
-    if(i === totalMonth -1){
+
+    if (i === totalMonth - 1) {
       capital = balance;
       interest = monthPay - capital;
     }
+
     balance = balance - capital;
     totalInterest += interest;
+
     schedule.push({
-      period:i+1,
-      pay:monthPay,
-      interest:Math.round(interest),
-      capital:Math.round(capital),
-      remain:Math.round(balance)
-    })
+      period: i + 1,
+      pay: monthPay,
+      interest: Math.round(interest),
+      capital: Math.round(capital),
+      remain: Math.round(balance)
+    });
   }
+
   totalInterest = Math.round(totalInterest);
   const totalPay = principal + totalInterest;
-  return {principal,monthPay,totalInterest,totalPay,schedule};
+
+  return { principal, monthPay, totalInterest, totalPay, schedule };
 }
-//單筆試算
-function calcSingle(){
+
+function calcSingle() {
   const wanVal = Number(document.getElementById("singleLoanWan").value);
   const y = Number(document.getElementById("singleLoanYear").value);
   const apr = Number(document.getElementById("singleRate").value);
-  if(!wanVal || !y || !apr){
+
+  if (!wanVal || !y || !apr) {
     alert("請填寫單筆區：貸款金額、年數、年利率");
     return;
   }
-  const res = calcCore(wanVal,y,apr);
-  //填入卡片
+
+  const res = calcCore(wanVal, y, apr);
+
   document.getElementById("cardLoan").innerText = res.principal.toLocaleString() + " 元";
   document.getElementById("cardMonthPay").innerText = res.monthPay.toLocaleString() + " 元";
   document.getElementById("cardTotalInt").innerText = res.totalInterest.toLocaleString() + " 元";
   document.getElementById("cardTotalPay").innerText = res.totalPay.toLocaleString() + " 元";
-  //前8期
+
   const frontTbody = document.getElementById("tableFront8");
   frontTbody.innerHTML = "";
-  for(let i=0;i<8;i++){
+  for (let i = 0; i < 8; i++) {
     const r = res.schedule[i];
     const tr = document.createElement("tr");
-    tr.innerHTML = `<td>${r.period}</td><td>${r.pay.toLocaleString()}</td><td>${r.interest.toLocaleString()}</td><td>${r.capital.toLocaleString()}</td><td>${r.remain.toLocaleString()}</td>`;
+    tr.innerHTML = `
+      <td>${r.period}</td>
+      <td>${r.pay.toLocaleString()}</td>
+      <td>${r.interest.toLocaleString()}</td>
+      <td>${r.capital.toLocaleString()}</td>
+      <td>${r.remain.toLocaleString()}</td>
+    `;
     frontTbody.appendChild(tr);
   }
-  //後8期
-  const totalMonth = y*12;
+
+  const totalMonth = y * 12;
   const backStart = totalMonth - 8;
-  document.getElementById("backTitle").innerText = `${backStart+1}～${totalMonth}期`;
+  document.getElementById("backTitle").innerText = `${backStart + 1}～${totalMonth}期`;
+
   const backTbody = document.getElementById("tableBack8");
   backTbody.innerHTML = "";
-  for(let i=backStart; i<totalMonth;i++){
+  for (let i = backStart; i < totalMonth; i++) {
     const r = res.schedule[i];
     const tr = document.createElement("tr");
-    tr.innerHTML = `<td>${r.period}</td><td>${r.pay.toLocaleString()}</td><td>${r.interest.toLocaleString()}</td><td>${r.capital.toLocaleString()}</td><td>${r.remain.toLocaleString()}</td>`;
+    tr.innerHTML = `
+      <td>${r.period}</td>
+      <td>${r.pay.toLocaleString()}</td>
+      <td>${r.interest.toLocaleString()}</td>
+      <td>${r.capital.toLocaleString()}</td>
+      <td>${r.remain.toLocaleString()}</td>
+    `;
     backTbody.appendChild(tr);
   }
-  document.getElementById("resultWrap").style.display = "flex";
+
+  document.getElementById("resultWrap").classList.add("show");
 }
-//區間批量試算
-function batchRangeCalc(){
+
+function batchRangeCalc() {
   const start = Number(document.getElementById("rangeStartWan").value);
   const end = Number(document.getElementById("rangeEndWan").value);
   const y = Number(document.getElementById("rangeLoanYear").value);
   const apr = Number(document.getElementById("rangeRate").value);
-  if(!start || !end || !y || !apr){
+
+  if (!start || !end || !y || !apr) {
     alert("請填寫區間區：起始金額、結束金額、年數、利率");
     return;
   }
-  if(start>end){
+
+  if (start > end) {
     alert("起始金額不能大於結束金額");
     return;
   }
-  //固定間距10萬
-  for(let amt=start; amt<=end; amt+=FIX_STEP){
-    const res = calcCore(amt,y,apr);
-    multiData.push({wanVal:amt,y,apr,monthPay:res.monthPay,totalInterest:res.totalInterest,totalPay:res.totalPay});
+
+  for (let amt = start; amt <= end; amt += FIX_STEP) {
+    const res = calcCore(amt, y, apr);
+    multiData.push({
+      wanVal: amt,
+      y,
+      apr,
+      monthPay: res.monthPay,
+      totalInterest: res.totalInterest,
+      totalPay: res.totalPay
+    });
   }
+
   renderMultiTable();
 }
-function renderMultiTable(){
+
+function renderMultiTable() {
   const tbody = document.getElementById("multiTbody");
-  tbody.innerHTML="";
-  multiData.forEach((item,idx)=>{
+  tbody.innerHTML = "";
+
+  multiData.forEach((item, idx) => {
     const tr = document.createElement("tr");
-    tr.innerHTML=`
+    tr.innerHTML = `
       <td>${item.wanVal}</td>
       <td>${item.y}</td>
       <td>${item.apr}</td>
@@ -486,33 +566,36 @@ function renderMultiTable(){
       <td><button onclick="delItem(${idx})">刪除</button></td>
     `;
     tbody.appendChild(tr);
-  })
+  });
 }
-function delItem(idx){
-  multiData.splice(idx,1);
+
+function delItem(idx) {
+  multiData.splice(idx, 1);
   renderMultiTable();
 }
-function clearMulti(){
-  multiData=[];
+
+function clearMulti() {
+  multiData = [];
   renderMultiTable();
 }
-function clearAll(){
-  //清空單筆
+
+function clearAll() {
   document.getElementById("singleLoanWan").value = "";
   document.getElementById("singleLoanYear").value = "";
   document.getElementById("rocY").value = "";
   document.getElementById("rocM").value = "";
   document.getElementById("singleRate").value = "";
-  //清空區間
+
   document.getElementById("rangeStartWan").value = "";
   document.getElementById("rangeEndWan").value = "";
   document.getElementById("rangeLoanYear").value = "";
   document.getElementById("rangeRate").value = "";
-  //清結果與清單
-  multiData=[];
+
+  multiData = [];
   renderMultiTable();
-  document.getElementById("resultWrap").style.display = "none";
+  document.getElementById("resultWrap").classList.remove("show");
 }
 </script>
+
 </body>
 </html>
