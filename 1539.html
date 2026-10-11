@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<title>本息平均攤還試算｜區間批量 / 單筆分開輸入</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<style>
+*{box-sizing:border-box;font-family:"Microsoft JhengHei","Noto Sans TC",sans-serif;margin:0;padding:0;}
+body{
+  background:#f7f1e3;
+  color:#3b3328;
+  padding:20px;
+  background-image:
+    radial-gradient(circle at 10% 10%, rgba(255,255,255,.8) 0, rgba(255,255,255,0) 40%),
+    radial-gradient(circle at 90% 80%, rgba(255,255,255,.6) 0, rgba(255,255,255,0) 45%);
+}
+.page-title{
+  width:100%;
+  max-width:760px;
+  margin:0 auto 14px;
+  background:#0066FF;
+  color:#fff;
+  font-size:16px;
+  font-weight:bold;
+  text-align:center;
+  padding:10px 14px;
+  border-radius:14px 14px 4px 4px;
+  letter-spacing:1px;
+  box-shadow:0 4px 0 #0047b3, 0 8px 18px rgba(0,102,255,.25);
+  position:relative;
+}
+.page-title::before,
+.page-title::after{
+  content:"";
+  position:absolute;
+  top:14px;
+  width:18px;
+  height:18px;
+  border-radius:50%;
+  background:rgba(255,255,255,.25);
+}
+.page-title::before{left:14px;}
+.page-title::after{right:14px;}
+/* 版型切換列 */
+.mode-bar{
+  max-width:760px;
+  margin:0 auto 12px;
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+.mode-btn{
+  padding:7px 12px;
+  border-radius:10px;
+  border:2px solid #0066FF;
+  background:#fff;
+  color:#0066FF;
+  font-weight:bold;
+  cursor:pointer;
+}
+.mode-btn.active{
+  background:#0066FF;
+  color:#fff;
+}
+.container{
+  max-width:760px;
+  margin:0 auto;
+  background:#fffdf4;
+  border:2px solid #e8ddc1;
+  border-radius:18px;
+  padding:18px;
+  box-shadow:0 10px 30px rgba(80,60,20,.15), inset 0 0 0 6px rgba(255,255,255,.6);
+  position:relative;
+}
+.container::before{
+  content:"";
+  position:absolute;
+  inset:6px;
+  border:1px dashed rgba(0,102,255,.25);
+  border-radius:14px;
+  pointer-events:none;
+}
+.wrap{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+.left-panel{
+  background:#ffffff;
+  border:2px solid #0066FF;
+  border-radius:16px;
+  padding:16px;
+  box-shadow:0 6px 14px rgba(0,102,255,.12), inset 0 0 0 4px #fff;
+  position:relative;
+}
+.left-panel::before{
+  content:"";
+  position:absolute;
+  inset:4px;
+  border:1px solid rgba(0,102,255,.2);
+  border-radius:12px;
+  pointer-events:none;
+}
+.left-panel h3{
+  font-size:15px;
+  color:#0066FF;
+  margin-bottom:12px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.left-panel h3::before{
+  content:"";
+  width:5px;
+  height:15px;
+  background:#0066FF;
+  border-radius:3px;
+  box-shadow:0 0 0 2px rgba(0,102,255,.2);
+}
+.sub-title{
+  font-size:14px;
+  font-weight:bold;
+  margin-bottom:10px;
+  color:#0066FF;
+  padding-left:10px;
+  border-left:4px solid #0066FF;
+}
+.field{
+  margin-bottom:10px;
+}
+.field label{
+  display:block;
+  font-size:13px;
+  color:#5a4b3a;
+  margin-bottom:4px;
+}
+.field input{
+  width:100%;
+  padding:8px 10px;
+  border:2px solid #d9e8ff;
+  border-radius:10px;
+  font-size:14px;
+  background:#fafcff;
+  color:#3b3328;
+  transition:all .2s;
+}
+.field input:focus{
+  outline:none;
+  border-color:#0066FF;
+  background:#fff;
+  box-shadow:0 0 0 3px rgba(0,102,255,.15);
+}
+.inline-row,
+.inline-row-2{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+.block-sep{
+  margin:16px 0;
+  border:none;
+  border-top:2px dashed #d9e8ff;
+}
+.btn-group{
+  display:flex;
+  gap:10px;
+  margin-top:12px;
+}
+.btn{
+  flex:1;
+  padding:9px 12px;
+  border:none;
+  border-radius:12px;
+  font-size:14px;
+  font-weight:bold;
+  cursor:pointer;
+  color:#fff;
+  transition:transform .15s ease, box-shadow .2s ease, background .2s;
+  letter-spacing:.5px;
+}
+.btn:hover{transform:translateY(-1px);}
+.btn:active{transform:translateY(1px);}
+.btn-blue-main{
+  background:#0066FF;
+  box-shadow:0 5px 0 #0047b3, 0 10px 16px rgba(0,102,255,.25);
+}
+.btn-blue-main:hover{background:#1a75ff;}
+.btn-blue-light{
+  background:#4d94ff;
+  box-shadow:0 5px 0 #3377e6, 0 10px 16px rgba(77,148,255,.25);
+}
+.btn-blue-light:hover{background:#66a3ff;}
+.btn-gray-pale{
+  background:#fff;
+  color:#0066FF;
+  border:2px solid #0066FF;
+  box-shadow:0 4px 0 #d9e8ff;
+}
+.btn-gray-pale:hover{background:#f0f7ff;}
+.multi-list{
+  margin-top:14px;
+}
+.multi-list h4{
+  font-size:14px;
+  margin-bottom:10px;
+  color:#0066FF;
+}
+#multiTableWrap{
+  overflow-x:auto;
+}
+#multiTable{
+  width:100%;
+  border-collapse:collapse;
+  background:#fff;
+  border-radius:10px;
+  overflow:hidden;
+  box-shadow:0 4px 10px rgba(0,102,255,.1);
+}
+#multiTable th,
+#multiTable td{
+  border:1px solid #d9e8ff;
+  padding:6px 5px;
+  text-align:center;
+  font-size:13px;
+  color:#3b3328;
+}
+#multiTable th{
+  background:#f0f7ff;
+  color:#0066FF;
+}
+.right-area{
+  display:none;
+  flex-direction:column;
+  gap:14px;
+}
+.right-area.show{
+  display:flex;
+}
+.result-header-bar{
+  background:#ffffff;
+  border:2px solid #0066FF;
+  padding:12px 14px;
+  border-radius:14px;
+  font-size:15px;
+  font-weight:bold;
+  color:#0066FF;
+  box-shadow:0 6px 14px rgba(0,102,255,.12);
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.result-header-bar::before{
+  content:"";
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  background:#0066FF;
+  box-shadow:0 0 0 3px rgba(0,102,255,.2);
+}
+.summary-row{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+}
+.sum-card{
+  background:#ffffff;
+  border:2px solid #d9e8ff;
+  border-radius:14px;
+  padding:12px 10px;
+  text-align:center;
+  box-shadow:0 4px 10px rgba(0,102,255,.08);
+  position:relative;
+}
+.sum-card .title{
+  font-size:13px;
+  color:#5a4b3a;
+  margin-bottom:6px;
+}
+.sum-card .num{
+  font-size:19px;
+  font-weight:bold;
+  color:#3b3328;
+  white-space:nowrap;
+}
+.sum-card.strong-card{
+  background:#0066FF;
+  border-color:#0066FF;
+  color:#fff;
+  box-shadow:0 6px 14px rgba(0,102,255,.25);
+}
+.sum-card.strong-card .title{
+  color:#cce4ff;
+}
+.sum-card.strong-card .num{
+  color:#fff;
+}
+.detail-wrap{
+  background:#ffffff;
+  border:2px solid #0066FF;
+  border-radius:16px;
+  padding:14px;
+  box-shadow:0 6px 14px rgba(0,102,255,.12);
+}
+.detail-top-bar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:12px;
+}
+.detail-title{
+  font-size:15px;
+  font-weight:bold;
+  color:#0066FF;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.detail-title::before{
+  content:"";
+  width:5px;
+  height:15px;
+  background:#0066FF;
+  border-radius:3px;
+}
+.btns-right{
+  display:flex;
+  gap:8px;
+}
+.btn-excel,
+.btn-pdf{
+  border:none;
+  border-radius:10px;
+  padding:6px 12px;
+  font-size:13px;
+  font-weight:bold;
+  cursor:pointer;
+  color:#fff;
+}
+.btn-excel{
+  background:#4d94ff;
+  box-shadow:0 4px 0 #3377e6;
+}
+.btn-excel:hover{background:#66a3ff;}
+.btn-pdf{
+  background:#0066FF;
+  box-shadow:0 4px 0 #0047b3;
+}
+.btn-pdf:hover{background:#1a75ff;}
+.two-table-row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+.table-block{
+  background:#ffffff;
+  border:2px solid #d9e8ff;
+  border-radius:14px;
+  padding:12px;
+  box-shadow:0 4px 10px rgba(0,102,255,.08);
+}
+.table-block h4{
+  font-size:14px;
+  margin-bottom:10px;
+  color:#0066FF;
+}
+.table-scroll{
+  overflow-x:auto;
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+}
+th,td{
+  border:1px solid #d9e8ff;
+  padding:5px 4px;
+  text-align:center;
+  font-size:13px;
+  color:#3b3328;
+}
+th{
+  background:#f0f7ff;
+  color:#0066FF;
+  font-weight:bold;
+}
+
+/* ===== iPhone X 手機版型 class（手動切換用） ===== */
+body.mode-mobile{
+  padding:12px;
+}
+body.mode-mobile .page-title{
+  font-size:15px;
+  padding:8px 10px;
+}
+body.mode-mobile .container{
+  padding:14px;
+}
+body.mode-mobile .inline-row,
+body.mode-mobile .inline-row-2{
+  grid-template-columns:1fr;
+}
+body.mode-mobile .btn-group{
+  flex-direction:column;
+}
+body.mode-mobile .summary-row{
+  grid-template-columns:repeat(2,1fr);
+}
+body.mode-mobile .sum-card .num{
+  font-size:16px;
+}
+body.mode-mobile .two-table-row{
+  grid-template-columns:1fr;
+}
+body.mode-mobile .detail-top-bar{
+  flex-direction:column;
+  align-items:flex-start;
+  gap:8px;
+}
+body.mode-mobile .btns-right{
+  width:100%;
+}
+body.mode-mobile .btns-right button{
+  flex:1;
+}
+
+/* 自動RWD斷點，沒有手動切換時才生效 */
+@media screen and (max-width:375px){
+  body:not(.mode-pc):not(.mode-mobile){
+    padding:12px;
+  }
+  body:not(.mode-pc):not(.mode-mobile) .page-title{
+    font-size:15px;
+    padding:8px 10px;
+  }
+  body:not(.mode-pc):not(.mode-mobile) .container{
+    padding:14px;
+  }
+  body:not(.mode-pc):not(.mode-mobile) .inline-row,
+  body:not(.mode-pc):not(.mode-mobile) .inline-row-2{
+    grid-template-columns:1fr;
+  }
+  body:not(.mode-pc):not(.mode-mobile) .btn-group{
+    flex-direction:column;
+  }
+  body:not(.mode-pc):not(.mode-mobile) .summary-row{
+    grid-template-columns:repeat(2,1fr);
+  }
+  body:not(.mode-pc):not(.mode-mobile) .sum-card .num{
+    font-size:16px;
+  }
+  body:not(.mode-pc):not(.mode-mobile) .two-table-row{
+    grid-template-columns:1fr;
+  }
+  body:not(.mode-pc):not(.mode-mobile) .detail-top-bar{
+    flex-direction:column;
+    align-items:flex-start;
+    gap:8px;
+  }
+  body:not(.mode-pc):not(.mode-mobile) .btns-right{
+    width:100%;
+  }
+  body:not(.mode-pc):not(.mode-mobile) .btns-right button{
+    flex:1;
+  }
+}
+</style>
+</head>
+<body>
+<!-- 版型切換按鈕列 -->
+<div class="mode-bar">
+  <button class="mode-btn active" data-mode="auto">自動RWD</button>
+  <button class="mode-btn" data-mode="pc">電腦版</button>
+  <button class="mode-btn" data-mode="mobile">iPhone X手機版</button>
+</div>
+
+<div class="page-title">本息平均攤還試算</div>
+<div class="container">
+  <div class="wrap">
+    <!-- 輸入面板 -->
+    <div class="left-panel">
+      <h3>貸款試算設定</h3>
+      <div>
+        <div class="sub-title">單筆試算</div>
+        <div class="field">
+          <label>貸款金額（萬元）</label>
+          <input type="number" id="singleLoanWan">
+        </div>
+        <div class="field">
+          <label>貸款年數</label>
+          <input type="number" id="singleLoanYear">
+        </div>
+        <div class="inline-row">
+          <div class="field">
+            <label>起始民國年</label>
+            <input type="number" id="rocY">
+          </div>
+          <div class="field">
+            <label>起始月份</label>
+            <input type="number" id="rocM">
+          </div>
+        </div>
+        <div class="field">
+          <label>年利率 %</label>
+          <input type="number" step="0.01" id="singleRate">
+        </div>
+        <div class="btn-group">
+          <button class="btn btn-blue-main" onclick="calcSingle()">單筆試算</button>
+        </div>
+      </div>
+      <div class="block-sep"></div>
+      <div>
+        <div class="sub-title">多筆金額試算（固定間距10萬）</div>
+        <div class="field">
+          <label>貸款金額區間（萬元）｜起 / 迄</label>
+          <div class="inline-row-2">
+            <input type="number" id="rangeStartWan" placeholder="起始，如100">
+            <input type="number" id="rangeEndWan" placeholder="結束，如150">
+          </div>
+        </div>
+        <div class="inline-row">
+          <div class="field">
+            <label>貸款年數</label>
+            <input type="number" id="rangeLoanYear">
+          </div>
+          <div class="field">
+            <label>年利率 %</label>
+            <input type="number" step="0.01" id="rangeRate">
+          </div>
+        </div>
+        <div class="btn-group">
+          <button class="btn btn-blue-light" onclick="batchRangeCalc()">多筆金額試算</button>
+          <button class="btn btn-gray-pale" onclick="clearAll()">全部清除</button>
+        </div>
+      </div>
+      <!-- 多筆清單 -->
+      <div class="multi-list">
+        <h4>多筆金額試算清單</h4>
+        <div id="multiTableWrap">
+          <table id="multiTable">
+            <thead>
+              <tr>
+                <th>貸款(萬)</th>
+                <th>年數</th>
+                <th>利率%</th>
+                <th>月繳</th>
+                <th>總利息</th>
+                <th>總繳款</th>
+                <th>移除</th>
+              </tr>
+            </thead>
+            <tbody id="multiTbody"></tbody>
+          </table>
+        </div>
+        <div class="btn-group" style="margin-top:10px;">
+          <button class="btn btn-gray-pale" onclick="clearMulti()">清空多筆清單</button>
+        </div>
+      </div>
+    </div>
+    <!-- 試算結果 -->
+    <div class="right-area" id="resultWrap">
+      <div class="result-header-bar">試算結果摘要</div>
+      <div class="summary-row">
+        <div class="sum-card">
+          <div class="title">貸款金額</div>
+          <div class="num" id="cardLoan">0元</div>
+        </div>
+        <div class="sum-card">
+          <div class="title">每月應繳金額</div>
+          <div class="num" id="cardMonthPay">0元</div>
+        </div>
+        <div class="sum-card">
+          <div class="title">總利息</div>
+          <div class="num" id="cardTotalInt">0元</div>
+        </div>
+        <div class="sum-card strong-card">
+          <div class="title">總計繳款金額</div>
+          <div class="num" id="cardTotalPay">0元</div>
+        </div>
+      </div>
+      <div class="detail-wrap">
+        <div class="detail-top-bar">
+          <div class="detail-title">還款明細</div>
+          <div class="btns-right">
+            <button class="btn-excel">Excel匯出</button>
+            <button class="btn-pdf">PDF列印</button>
+          </div>
+        </div>
+        <div class="two-table-row">
+          <div class="table-block">
+            <h4>前8期（第1～8期）</h4>
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>期數</th>
+                    <th>應繳總額</th>
+                    <th>利息</th>
+                    <th>本金</th>
+                    <th>剩餘本金</th>
+                  </tr>
+                </thead>
+                <tbody id="tableFront8"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="table-block">
+            <h4>後8期（<span id="backTitle">77～84期</span>）</h4>
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>期數</th>
+                    <th>應繳總額</th>
+                    <th>利息</th>
+                    <th>本金</th>
+                    <th>剩餘本金</th>
+                  </tr>
+                </thead>
+                <tbody id="tableBack8"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+let multiData = [];
+const FIX_STEP = 10;
+
+// 版型切換
+const modeBtns = document.querySelectorAll('.mode-btn');
+modeBtns.forEach(btn=>{
+  btn.onclick = function(){
+    const mode = this.dataset.mode;
+    modeBtns.forEach(b=>b.classList.remove('active'));
+    this.classList.add('active');
+    document.body.classList.remove('mode-pc','mode-mobile');
+    if(mode === 'pc'){
+      document.body.classList.add('mode-pc');
+    }else if(mode === 'mobile'){
+      document.body.classList.add('mode-mobile');
+    }
+  }
+})
+
+function calcCore(wanVal, y, apr) {
+  const principal = wanVal * 10000;
+  const monthRate = apr / 100 / 12;
+  const totalMonth = y * 12;
+  let monthPay;
+  if (monthRate === 0) {
+    monthPay = principal / totalMonth;
+  } else {
+    monthPay = principal * monthRate * Math.pow(1 + monthRate, totalMonth) /
+               (Math.pow(1 + monthRate, totalMonth) - 1);
+  }
+  monthPay = Math.round(monthPay);
+  let balance = principal;
+  let totalInterest = 0;
+  let schedule = [];
+  for (let i = 0; i < totalMonth; i++) {
+    let interest = balance * monthRate;
+    let capital = monthPay - interest;
+    if (i === totalMonth - 1) {
+      capital = balance;
+      interest = monthPay - capital;
+    }
+    balance = balance - capital;
+    totalInterest += interest;
+    schedule.push({
+      period: i + 1,
+      pay: monthPay,
+      interest: Math.round(interest),
+      capital: Math.round(capital),
+      remain: Math.round(balance)
+    });
+  }
+  totalInterest = Math.round(totalInterest);
+  const totalPay = principal + totalInterest;
+  return { principal, monthPay, totalInterest, totalPay, schedule };
+}
+function calcSingle() {
+  const wanVal = Number(document.getElementById("singleLoanWan").value);
+  const y = Number(document.getElementById("singleLoanYear").value);
+  const apr = Number(document.getElementById("singleRate").value);
+  if (!wanVal || !y || !apr) {
+    alert("請填寫單筆區：貸款金額、年數、年利率");
+    return;
+  }
+  const res = calcCore(wanVal, y, apr);
+  document.getElementById("cardLoan").innerText = res.principal.toLocaleString() + " 元";
+  document.getElementById("cardMonthPay").innerText = res.monthPay.toLocaleString() + " 元";
+  document.getElementById("cardTotalInt").innerText = res.totalInterest.toLocaleString() + " 元";
+  document.getElementById("cardTotalPay").innerText = res.totalPay.toLocaleString() + " 元";
+  const frontTbody = document.getElementById("tableFront8");
+  frontTbody.innerHTML = "";
+  for (let i = 0; i < 8; i++) {
+    const r = res.schedule[i];
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${r.period}</td>
+      <td>${r.pay.toLocaleString()}</td>
+      <td>${r.interest.toLocaleString()}</td>
+      <td>${r.capital.toLocaleString()}</td>
+      <td>${r.remain.toLocaleString()}</td>
+    `;
+    frontTbody.appendChild(tr);
+  }
+  const totalMonth = y * 12;
+  const backStart = totalMonth - 8;
+  document.getElementById("backTitle").innerText = `${backStart + 1}～${totalMonth}期`;
+  const backTbody = document.getElementById("tableBack8");
+  backTbody.innerHTML = "";
+  for (let i = backStart; i < totalMonth; i++) {
+    const r = res.schedule[i];
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${r.period}</td>
+      <td>${r.pay.toLocaleString()}</td>
+      <td>${r.interest.toLocaleString()}</td>
+      <td>${r.capital.toLocaleString()}</td>
+      <td>${r.remain.toLocaleString()}</td>
+    `;
+    backTbody.appendChild(tr);
+  }
+  document.getElementById("resultWrap").classList.add("show");
+}
+function batchRangeCalc() {
+  const start = Number(document.getElementById("rangeStartWan").value);
+  const end = Number(document.getElementById("rangeEndWan").value);
+  const y = Number(document.getElementById("rangeLoanYear").value);
+  const apr = Number(document.getElementById("rangeRate").value);
+  if (!start || !end || !y || !apr) {
+    alert("請填寫區間區：起始金額、結束金額、年數、利率");
+    return;
+  }
+  if (start > end) {
+    alert("起始金額不能大於結束金額");
+    return;
+  }
+  for (let amt = start; amt <= end; amt += FIX_STEP) {
+    const res = calcCore(amt, y, apr);
+    multiData.push({
+      wanVal: amt,
+      y,
+      apr,
+      monthPay: res.monthPay,
+      totalInterest: res.totalInterest,
+      totalPay: res.totalPay
+    });
+  }
+  renderMultiTable();
+}
+function renderMultiTable() {
+  const tbody = document.getElementById("multiTbody");
+  tbody.innerHTML = "";
+  multiData.forEach((item, idx) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${item.wanVal}</td>
+      <td>${item.y}</td>
+      <td>${item.apr}</td>
+      <td>${item.monthPay.toLocaleString()}</td>
+      <td>${item.totalInterest.toLocaleString()}</td>
+      <td>${item.totalPay.toLocaleString()}</td>
+      <td><button onclick="delItem(${idx})">刪除</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+function delItem(idx) {
+  multiData.splice(idx, 1);
+  renderMultiTable();
+}
+function clearMulti() {
+  multiData = [];
+  renderMultiTable();
+}
+function clearAll() {
+  document.getElementById("singleLoanWan").value = "";
+  document.getElementById("singleLoanYear").value = "";
+  document.getElementById("rocY").value = "";
+  document.getElementById("rocM").value = "";
+  document.getElementById("singleRate").value = "";
+  document.getElementById("rangeStartWan").value = "";
+  document.getElementById("rangeEndWan").value = "";
+  document.getElementById("rangeLoanYear").value = "";
+  document.getElementById("rangeRate").value = "";
+  multiData = [];
+  renderMultiTable();
+  document.getElementById("resultWrap").classList.remove("show");
+}
+</script>
+</body>
+</html>
