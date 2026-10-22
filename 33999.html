@@ -10,12 +10,10 @@
 body{padding:10px;background:#fff;margin:0;}
 .wrap{max-width:720px;margin:0 auto;border:1px solid #337ab7;}
 .title-bar{background:#2767ad;color:#fff;padding:8px;text-align:center;font-size:18px;font-weight:bold;}
-
 /* ===== 版本切換 ===== */
 .vt-toggle{display:flex;border-bottom:1px solid #337ab7;background:#f4f8ff;}
 .vt-btn{flex:1;padding:8px 0;border:none;background:transparent;font-size:14px;cursor:pointer;color:#2767ad;font-family:inherit;}
 .vt-btn.active{background:#2767ad;color:#fff;font-weight:bold;}
-
 .input-area{background:#e8f2ff;padding:10px;}
 .input-row{display:flex;align-items:center;margin:6px 0;gap:6px;}
 .input-row label{width:180px;padding:3px;font-size:14px;}
@@ -25,24 +23,19 @@ body{padding:10px;background:#fff;margin:0;}
 .inline-group input{width:90px;}
 .btn-group{text-align:center;margin:8px 0;}
 button{padding:5px 12px;font-size:14px;margin:0 3px;cursor:pointer;font-family:inherit;}
-
 #resultBlock{padding:8px;}
 h3{font-size:16px;margin:6px 0;}
 h4{font-size:14px;margin:6px 0;}
 .param-strip{display:none;} /* 僅手機版顯示參數列 */
-
 table{width:100%;border-collapse:collapse;margin-top:8px;}
 th{background:#2767ad;color:#fff;padding:6px;text-align:center;font-size:14px;}
 td{border:1px solid #ccc;padding:5px;text-align:center;font-size:13px;}
 .omit-row td{text-align:center;color:#333;background:#f4f8ff;font-size:13px;}
-
 .result-summary{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;margin:8px 0;gap:6px;}
 .sum-card{border:1px solid #ccc;padding:4px 2px;text-align:center;}
 .sum-card div{font-size:23px;}
 .sum-card .big-red{font-size:24px;color:red;font-weight:bold;margin-top:4px;white-space:nowrap;}
-
 .result-actions{display:none;} /* 手機版才顯示：返回修改／列印 */
-
 /* ========== 手機版（iPhone XR 414×896 一頁顯示） ========== */
 body[data-mode="mobile"]{padding:0;}
 body[data-mode="mobile"] .wrap{max-width:414px;border:none;}
@@ -54,7 +47,6 @@ body[data-mode="mobile"] .input-row label{width:150px;font-size:14px;}
 body[data-mode="mobile"] .input-row input{width:180px;font-size:16px;padding:6px;}
 body[data-mode="mobile"] .inline-group input{width:82px;}
 body[data-mode="mobile"] button{padding:8px 14px;font-size:15px;min-height:40px;}
-
 body[data-mode="mobile"] #resultBlock{padding:8px 10px 10px;}
 body[data-mode="mobile"] h3{font-size:18px;margin:2px 0 8px;text-align:center;}
 body[data-mode="mobile"] h4{font-size:14px;margin:10px 0 4px;}
@@ -76,7 +68,6 @@ body[data-mode="mobile"] th:nth-child(6){width:32%;}
 body[data-mode="mobile"] .omit-row td{font-size:12px;padding:5px 2px;}
 body[data-mode="mobile"] .result-actions{display:flex;gap:10px;margin-top:10px;}
 body[data-mode="mobile"] .result-actions button{flex:1;margin:0;}
-
 /* ========== 列印專用CSS ========== */
 @media print {
     body * {
@@ -95,6 +86,12 @@ body[data-mode="mobile"] .result-actions button{flex:1;margin:0;}
     .btn-group, .vt-toggle, button {
         display: none !important;
     }
+}
+.tip-text{
+    margin-top:12px;
+    padding:8px;
+    font-size:15px;
+    color:#222;
 }
 </style>
 </head>
@@ -175,12 +172,13 @@ body[data-mode="mobile"] .result-actions button{flex:1;margin:0;}
       <button onclick="backToInput()">返回修改</button>
       <button onclick="printResult()">列印</button>
     </div>
+    <!-- 自動生成文字放這裡 -->
+    <div class="tip-text" id="autoTip"></div>
   </div>
 </div>
 <script>
 // 儲存最近一次試算結果，供版本切換時重新渲染
 let lastCalc = null;
-
 // 切換版本：web / mobile
 function setMode(mode){
   document.body.dataset.mode = mode;
@@ -193,7 +191,6 @@ function setMode(mode){
     backToInput();
   }
 }
-
 // 單筆試算
 function calc(){
   const PWan = Number(document.getElementById('principal').value);
@@ -248,31 +245,33 @@ function calc(){
   lastCalc = { PWan: PWan, year: year, apr: apr, rocY: rocY, rocM: rocM, P: P, monthPay: monthPay, totalInterest: totalInterest, rows: rows };
   renderResult();
 }
-
 // 依目前版本重新渲染結果
 function renderResult(){
   if(!lastCalc) return;
   const d = lastCalc;
   const isMobile = document.body.dataset.mode === 'mobile';
-
   // 參數列（手機版）
   document.getElementById('paramStrip').innerHTML =
     '<span>貸款金額 <b>' + d.PWan.toLocaleString() + ' 萬</b></span>' +
     '<span>年數 <b>' + d.year + ' 年</b></span>' +
     '<span>年利率 <b>' + d.apr + '%</b></span>' +
     '<span>起算 <b>' + d.rocY + '/' + String(d.rocM).padStart(2,'0') + '</b></span>';
-
   //摘要：貸款本金顯示萬，其餘維持元
-  document.getElementById('monthPayText').innerText = Math.round(d.monthPay).toLocaleString() + ' 元';
+  const monthPayRound = Math.round(d.monthPay);
+  document.getElementById('monthPayText').innerText = monthPayRound.toLocaleString() + ' 元';
   document.getElementById('priText').innerText = d.PWan.toLocaleString() + ' 萬';
   document.getElementById('totalPayText').innerText = Math.round(d.P + d.totalInterest).toLocaleString() + ' 元';
   document.getElementById('totalIntText').innerText = Math.round(d.totalInterest).toLocaleString() + ' 元';
+
+  // 自動產生那句文字
+  const totalPeriod = d.year * 12;
+  document.getElementById('autoTip').innerText =
+    `幫您試算的是貸款金額${d.PWan.toLocaleString()}萬，分期${d.year}年${totalPeriod}期，每月應繳金額${monthPayRound.toLocaleString()} 元，您看一下月付金額您能不能負擔`;
 
   //表格：手機版前6後6，網頁版前8後8
   const front = isMobile ? 6 : 8;
   const back = isMobile ? 6 : 8;
   document.getElementById('detailTitle').innerText = '還款明細表（僅顯示前' + front + '期與後' + back + '期，中間期數省略）';
-
   const tbody = document.getElementById('scheduleBody');
   tbody.innerHTML = "";
   d.rows.slice(0, front).forEach(function(r){ addRow(tbody, r); });
@@ -281,7 +280,6 @@ function renderResult(){
   omitTr.innerHTML = '<td colspan="6">……中間期數省略……</td>';
   tbody.appendChild(omitTr);
   d.rows.slice(-back).forEach(function(r){ addRow(tbody, r); });
-
   //顯示結果；手機版收起輸入區以整頁顯示
   const ia = document.querySelector('.input-area');
   const rb = document.getElementById('resultBlock');
@@ -289,7 +287,6 @@ function renderResult(){
   ia.style.display = isMobile ? "none" : "block";
   window.scrollTo(0,0);
 }
-
 function addRow(tbody,r){
   const tr = document.createElement('tr');
   tr.innerHTML = '' +
@@ -301,7 +298,6 @@ function addRow(tbody,r){
     '<td>' + Math.round(r.bal).toLocaleString() + '</td>';
   tbody.appendChild(tr);
 }
-
 // 手機版：從結果頁返回修改
 function backToInput(){
   lastCalc = null;
@@ -309,7 +305,6 @@ function backToInput(){
   document.getElementById('resultBlock').style.display = "none";
   window.scrollTo(0,0);
 }
-
 // 清除全部欄位與結果
 function clearAll(){
   document.getElementById('principal').value='';
@@ -321,7 +316,6 @@ function clearAll(){
   document.querySelector('.input-area').style.display = "block";
   document.getElementById('resultBlock').style.display="none";
 }
-
 // 列印功能
 function printResult(){
   if(document.getElementById('resultBlock').style.display === "none"){
