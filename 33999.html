@@ -36,6 +36,19 @@ td{border:1px solid #ccc;padding:5px;text-align:center;font-size:13px;}
 .sum-card div{font-size:23px;}
 .sum-card .big-red{font-size:24px;color:red;font-weight:bold;margin-top:4px;white-space:nowrap;}
 .result-actions{display:none;} /* 手機版才顯示：返回修改／列印 */
+.tip-wrap{
+    margin-top:12px;
+    padding:8px;
+}
+.tip-text{
+    font-size:15px;
+    color:#222;
+    margin-bottom:8px;
+}
+.copy-btn{
+    padding:4px 10px;
+    font-size:13px;
+}
 /* ========== 手機版（iPhone XR 414×896 一頁顯示） ========== */
 body[data-mode="mobile"]{padding:0;}
 body[data-mode="mobile"] .wrap{max-width:414px;border:none;}
@@ -83,15 +96,9 @@ body[data-mode="mobile"] .result-actions button{flex:1;margin:0;}
         width:100%;
         border:none;
     }
-    .btn-group, .vt-toggle, button {
+    .btn-group, .vt-toggle, button:not(.keep-print) {
         display: none !important;
     }
-}
-.tip-text{
-    margin-top:12px;
-    padding:8px;
-    font-size:15px;
-    color:#222;
 }
 </style>
 </head>
@@ -172,13 +179,18 @@ body[data-mode="mobile"] .result-actions button{flex:1;margin:0;}
       <button onclick="backToInput()">返回修改</button>
       <button onclick="printResult()">列印</button>
     </div>
-    <!-- 自動生成文字放這裡 -->
-    <div class="tip-text" id="autoTip"></div>
+    <!-- 自動生成文字 + 一鍵複製按鈕 -->
+    <div class="tip-wrap">
+      <div class="tip-text" id="autoTip"></div>
+      <button class="copy-btn keep-print" onclick="copyTip()">一鍵複製這段文字</button>
+    </div>
   </div>
 </div>
 <script>
 // 儲存最近一次試算結果，供版本切換時重新渲染
 let lastCalc = null;
+let tipContent = ""; // 儲存要複製的文字
+
 // 切換版本：web / mobile
 function setMode(mode){
   document.body.dataset.mode = mode;
@@ -191,6 +203,7 @@ function setMode(mode){
     backToInput();
   }
 }
+
 // 單筆試算
 function calc(){
   const PWan = Number(document.getElementById('principal').value);
@@ -245,6 +258,7 @@ function calc(){
   lastCalc = { PWan: PWan, year: year, apr: apr, rocY: rocY, rocM: rocM, P: P, monthPay: monthPay, totalInterest: totalInterest, rows: rows };
   renderResult();
 }
+
 // 依目前版本重新渲染結果
 function renderResult(){
   if(!lastCalc) return;
@@ -263,10 +277,10 @@ function renderResult(){
   document.getElementById('totalPayText').innerText = Math.round(d.P + d.totalInterest).toLocaleString() + ' 元';
   document.getElementById('totalIntText').innerText = Math.round(d.totalInterest).toLocaleString() + ' 元';
 
-  // 自動產生那句文字
+  // 自動產生那句文字，存入全域變數給複製函數取用
   const totalPeriod = d.year * 12;
-  document.getElementById('autoTip').innerText =
-    `幫您試算的是貸款金額${d.PWan.toLocaleString()}萬，分期${d.year}年${totalPeriod}期，每月應繳金額${monthPayRound.toLocaleString()} 元，您看一下月付金額您能不能負擔`;
+  tipContent = `幫您試算的是貸款金額${d.PWan.toLocaleString()}萬，分期${d.year}年${totalPeriod}期，每月應繳金額${monthPayRound.toLocaleString()} 元，您看一下月付金額您能不能負擔`;
+  document.getElementById('autoTip').innerText = tipContent;
 
   //表格：手機版前6後6，網頁版前8後8
   const front = isMobile ? 6 : 8;
@@ -287,6 +301,17 @@ function renderResult(){
   ia.style.display = isMobile ? "none" : "block";
   window.scrollTo(0,0);
 }
+
+// 一鍵複製文字
+async function copyTip(){
+  try{
+    await navigator.clipboard.writeText(tipContent);
+    alert("已複製！");
+  }catch(e){
+    alert("複製失敗，請手動選取文字複製");
+  }
+}
+
 function addRow(tbody,r){
   const tr = document.createElement('tr');
   tr.innerHTML = '' +
@@ -298,13 +323,16 @@ function addRow(tbody,r){
     '<td>' + Math.round(r.bal).toLocaleString() + '</td>';
   tbody.appendChild(tr);
 }
+
 // 手機版：從結果頁返回修改
 function backToInput(){
   lastCalc = null;
+  tipContent = "";
   document.querySelector('.input-area').style.display = "block";
   document.getElementById('resultBlock').style.display = "none";
   window.scrollTo(0,0);
 }
+
 // 清除全部欄位與結果
 function clearAll(){
   document.getElementById('principal').value='';
@@ -313,9 +341,11 @@ function clearAll(){
   document.getElementById('rocMonth').value='';
   document.getElementById('annualRate').value='';
   lastCalc = null;
+  tipContent = "";
   document.querySelector('.input-area').style.display = "block";
   document.getElementById('resultBlock').style.display="none";
 }
+
 // 列印功能
 function printResult(){
   if(document.getElementById('resultBlock').style.display === "none"){
