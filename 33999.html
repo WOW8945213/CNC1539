@@ -182,7 +182,7 @@ body[data-mode="mobile"] .result-actions button{flex:1;margin:0;}
     <!-- 自動生成文字 + 一鍵複製按鈕 -->
     <div class="tip-wrap">
       <div class="tip-text" id="autoTip"></div>
-      <button class="copy-btn keep-print" onclick="copyTip()">一鍵複製這段文字</button>
+      <button class="copy-btn keep-print" id="copyBtn" onclick="copyTip()">一鍵複製這段文字</button>
     </div>
   </div>
 </div>
@@ -302,13 +302,18 @@ function renderResult(){
   window.scrollTo(0,0);
 }
 
-// 一鍵複製文字
+// 一鍵複製文字，移除alert，改成按鈕文字短暫變成已複製
 async function copyTip(){
+  const btn = document.getElementById('copyBtn');
   try{
     await navigator.clipboard.writeText(tipContent);
-    alert("已複製！");
+    const oldText = btn.innerText;
+    btn.innerText = "已複製";
+    setTimeout(function(){
+      btn.innerText = oldText;
+    },1200);
   }catch(e){
-    alert("複製失敗，請手動選取文字複製");
+    // 失敗也不跳alert
   }
 }
 
