@@ -16,7 +16,7 @@ body{padding:10px;background:#fff;margin:0;}
 .input-area{background:#e8f2ff;padding:10px;}
 .input-row{display:flex;align-items:center;margin:6px 0;gap:6px;}
 .input-row label{width:180px;padding:3px;font-size:14px;}
-.input-row input{padding:5px;font-size:14px;width:200px;}
+.input-row input,.input-row select{padding:5px;font-size:14px;width:200px;}
 .input-row .unit{padding:0 3px;font-size:14px;}
 .inline-group{display:flex;gap:6px;align-items:center;}
 .inline-group input{width:90px;}
@@ -30,7 +30,6 @@ table{width:100%;border-collapse:collapse;margin-top:8px;}
 th{background:#2767ad;color:#fff;padding:6px;text-align:center;font-size:14px;}
 td{border:1px solid #ccc;padding:5px;text-align:center;font-size:13px;}
 
-/* 每12期跳色：奇數年白色，偶數年淺黃色 */
 tr.odd-year{background:#ffffff;}
 tr.even-year{background:#fff9db;}
 
@@ -61,7 +60,8 @@ body[data-mode="mobile"] .vt-btn{font-size:15px;padding:10px 0;}
 body[data-mode="mobile"] .input-area{padding:10px;}
 body[data-mode="mobile"] .input-row{margin:8px 0;gap:6px;}
 body[data-mode="mobile"] .input-row label{width:150px;font-size:14px;}
-body[data-mode="mobile"] .input-row input{width:180px;font-size:16px;padding:6px;}
+body[data-mode="mobile"] .input-row input,
+body[data-mode="mobile"] .input-row select{width:180px;font-size:16px;padding:6px;}
 body[data-mode="mobile"] .inline-group input{width:82px;}
 body[data-mode="mobile"] button{padding:8px 14px;font-size:15px;min-height:40px;}
 body[data-mode="mobile"] #resultBlock{padding:8px 10px 10px;}
@@ -100,7 +100,7 @@ body[data-mode="mobile"] .result-actions button{flex:1;margin:0;}
         width:100%;
         border:none;
     }
-    .btn-group, .vt-toggle, button:not(.keep-print) {
+    .btn-group, .vt-toggle, button:not(.keep-print), .color-select-row {
         display: none !important;
     }
 }
@@ -137,6 +137,16 @@ body[data-mode="mobile"] .result-actions button{flex:1;margin:0;}
       <label>年利率：</label>
       <input type="number" step="0.01" id="annualRate" value="">
       <span class="unit">%</span>
+    </div>
+    <div class="input-row color-select-row">
+      <label>表格交替底色：</label>
+      <select id="colorSelect" onchange="changeBgColor()">
+        <option value="#fff9db">淺黃</option>
+        <option value="#eefaf6">薄荷綠</option>
+        <option value="#f4f2fb">淺灰紫</option>
+        <option value="#fff3e6">奶油杏</option>
+        <option value="#f0f6ff">淺藍</option>
+      </select>
     </div>
     <div class="btn-group">
       <button onclick="calc()">試算</button>
@@ -197,6 +207,14 @@ body[data-mode="mobile"] .result-actions button{flex:1;margin:0;}
 let lastCalc = null;
 let tipContent = "";
 let showAll = false;
+
+function changeBgColor(){
+  const colorVal = document.getElementById('colorSelect').value;
+  document.querySelector('tr.even-year').style.backgroundColor = colorVal;
+  document.querySelectorAll('.even-year').forEach(tr=>{
+    tr.style.backgroundColor = colorVal;
+  })
+}
 
 function setMode(mode){
   document.body.dataset.mode = mode;
@@ -309,7 +327,7 @@ function renderResult(){
     tbody.appendChild(omitTr);
     d.rows.slice(-back).forEach(function(r){ addRow(tbody, r); });
   }
-
+  changeBgColor();
   const ia = document.querySelector('.input-area');
   const rb = document.getElementById('resultBlock');
   rb.style.display = "block";
