@@ -5,8 +5,6 @@
 <title>本息平均攤還試算</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232767ad'/%3E%3Ctext x='32' y='44' font-size='30' text-anchor='middle' fill='white' font-family='sans-serif'%3E貸%3C/text%3E%3C/svg%3E">
-<!-- 引入 html2canvas CDN -->
-<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <style>
 *{box-sizing:border-box;font-family: "Microsoft JhengHei",sans-serif;}
 body{padding:10px;background:#fff;margin:0;}
@@ -181,11 +179,11 @@ body[data-mode="mobile"] .result-actions button{flex:1;margin:0;}
       <button onclick="backToInput()">返回修改</button>
       <button onclick="printResult()">列印</button>
     </div>
-    <!-- 自動生成文字 + 一鍵複製 + 一鍵截圖 -->
+    <!-- 自動生成文字 + 一鍵複製 + 喚起Windows截圖工具 -->
     <div class="tip-wrap">
       <div class="tip-text" id="autoTip"></div>
       <button class="copy-btn keep-print" id="copyBtn" onclick="copyTip()">一鍵複製這段文字</button>
-      <button class="snap-btn keep-print" id="snapBtn" onclick="snapShot()">一鍵截圖</button>
+      <button class="snap-btn keep-print" id="snapBtn" onclick="openWinSnipping()">系統截圖(Win+Shift+S)</button>
     </div>
   </div>
 </div>
@@ -318,26 +316,12 @@ async function copyTip(){
   }
 }
 
-// ===== 新增：一鍵截圖函數 =====
-async function snapShot(){
+// 開啟 Windows 系統截圖工具（ms-screenclip 協定）
+function openWinSnipping(){
   const btn = document.getElementById('snapBtn');
   const oldText = btn.innerText;
-  btn.innerText = "截圖中…";
-  try{
-    const target = document.getElementById("resultBlock");
-    const canvas = await html2canvas(target, {
-      scale: 2,
-      useCORS: true,
-      backgroundColor: "#ffffff"
-    });
-    const link = document.createElement("a");
-    link.download = "貸款試算結果.png";
-    link.href = canvas.toDataURL("image/png");
-    link.click();
-    btn.innerText = "截圖完成";
-  }catch(err){
-    btn.innerText = "截圖失敗";
-  }
+  btn.innerText = "已開啟截圖";
+  window.location.href = "ms-screenclip://capture/image?rectangle";
   setTimeout(()=>{
     btn.innerText = oldText;
   },1200);
