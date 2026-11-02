@@ -29,9 +29,11 @@ h4{font-size:14px;margin:6px 0;}
 table{width:100%;border-collapse:collapse;margin-top:8px;}
 th{background:#2767ad;color:#fff;padding:6px;text-align:center;font-size:14px;}
 td{border:1px solid #ccc;padding:5px;text-align:center;font-size:13px;}
-/* 每12期跳色 */
+
+/* 每12期跳色：奇數年白色，偶數年淺黃色 */
 tr.odd-year{background:#ffffff;}
-tr.even-year{background:#f0f6ff;}
+tr.even-year{background:#fff9db;}
+
 .omit-row td{text-align:center;color:#333;background:#f4f8ff;font-size:13px;}
 .result-summary{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;margin:8px 0;gap:6px;}
 .sum-card{border:1px solid #ccc;padding:4px 2px;text-align:center;}
@@ -51,7 +53,7 @@ tr.even-year{background:#f0f6ff;}
     padding:4px 10px;
     font-size:13px;
 }
-/* ========== 手機版（iPhone XR 414×896 一頁顯示） ========== */
+/* ========== 手機版 ========== */
 body[data-mode="mobile"]{padding:0;}
 body[data-mode="mobile"] .wrap{max-width:414px;border:none;}
 body[data-mode="mobile"] .title-bar{font-size:16px;padding:10px 8px;}
@@ -194,7 +196,7 @@ body[data-mode="mobile"] .result-actions button{flex:1;margin:0;}
 <script>
 let lastCalc = null;
 let tipContent = "";
-let showAll = false; // 控制是否展開全部期數
+let showAll = false;
 
 function setMode(mode){
   document.body.dataset.mode = mode;
@@ -257,7 +259,7 @@ function calc(){
     }
   }
   lastCalc = { PWan: PWan, year: year, apr: apr, rocY: rocY, rocM: rocM, P: P, monthPay: monthPay, totalInterest: totalInterest, rows: rows };
-  showAll = false; // 每次新試算預設為縮減版
+  showAll = false;
   renderResult();
 }
 
@@ -317,7 +319,6 @@ function renderResult(){
 
 function addRow(tbody,r){
   const tr = document.createElement('tr');
-  // 每12期換底色：第1~12白色、13~24淺藍、25~36白色…
   const yearSeq = Math.ceil(r.period / 12);
   if(yearSeq % 2 === 1){
     tr.className = "odd-year";
