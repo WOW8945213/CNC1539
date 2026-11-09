@@ -24,25 +24,24 @@
             background: #ffffff;
         }
         .top-bar {
-            height: 56px;
+            padding: 18px 20px;
             background: #fff;
-            border-bottom: 1px solid #e5e7eb;
             display: flex;
-            align-items: center;
-            padding: 0 16px;
-            gap: 12px;
+            flex-direction: column;
+            gap:18px;
         }
         .role-switch-wrap {
             display: flex;
-            gap: 8px;
+            gap: 16px;
         }
         .role-btn {
-            padding: 6px 14px;
-            border: 1px solid #d0d7e0;
-            border-radius: 20px;
+            padding: 12px 32px;
+            border: 2px solid #d8dce3;
+            border-radius: 32px;
             background: #fff;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 22px;
+            color:#222;
         }
         .role-btn.active {
             background: #06c755;
@@ -50,19 +49,22 @@
             border-color: #06c755;
         }
         .chat-header {
-            flex: 1;
             display: flex;
             align-items: center;
-            gap: 8px;
-            font-size: 17px;
-            font-weight: 500;
+            gap:16px;
+            padding: 8px 4px;
         }
         .chat-header .avatar {
-            width: 36px;
-            height: 36px;
+            width: 72px;
+            height: 72px;
             border-radius: 50%;
             object-fit: cover;
             background: #eee;
+        }
+        .chat-header .name-text{
+            font-size:36px;
+            font-weight:500;
+            color:#111;
         }
         .chat-scroll {
             flex: 1;
@@ -238,7 +240,7 @@
             </div>
             <div class="chat-header">
                 <img class="avatar" id="headerAvatar" src="" alt="頭像">
-                <span id="headerName">Kun（胖8.25）</span>
+                <span class="name-text" id="headerName">Kun（胖8.25）</span>
             </div>
         </div>
         <div class="chat-scroll" id="chatScroll">
