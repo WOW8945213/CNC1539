@@ -45,7 +45,7 @@ input,textarea{font:inherit;color:inherit}
   padding:clamp(9px,1.07cqw,15px) clamp(12px,2.4cqw,26px) 0;
   background:#fff;
 }
-.seg{display:flex;gap:clamp(8px,1.44cqw,16px);max-width:100%;flex-wrap:wrap}
+.seg{display:flex;gap:clamp(8px,1.44cqw,16px);max-width:100%;flex-wrap:nowrap;min-width:0}
 .seg button{
   display:inline-flex;align-items:center;justify-content:center;
   height:clamp(30px,3.73cqw,44px);
@@ -53,9 +53,9 @@ input,textarea{font:inherit;color:inherit}
   border-radius:999px;
   font-size:clamp(12.5px,1.95cqw,22px);line-height:1;color:#2E2E2E;
   background:#fff;border:1px solid #CFCFD2;
-  white-space:nowrap;transition:background .15s,color .15s,border-color .15s;
+  white-space:nowrap;flex:0 0 auto;transition:background .15s,color .15s,border-color .15s;
 }
-.seg button .tx{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.seg button .tx{overflow:visible;text-overflow:clip;white-space:nowrap}
 .seg button.active{background:var(--green);color:#fff;border-color:var(--green);font-weight:600}
 .seg button.active:hover{border-color:var(--green)}
 
@@ -144,7 +144,7 @@ input,textarea{font:inherit;color:inherit}
 .row.mine{justify-content:flex-end}
 .row.them{justify-content:flex-start}
 .bubble{
-  max-width:min(76%,520px);padding:9px 12px;font-size:14px;line-height:1.6;
+  max-width:min(76%,calc(30em + 24px));padding:9px 12px;font-size:14px;line-height:1.6;
   white-space:pre-wrap;word-break:break-word;overflow-wrap:anywhere;
   box-shadow:0 1px 0 rgba(0,0,0,.03);
 }
@@ -335,16 +335,15 @@ body.pure .role-bar{display:none}
   }
   .side.open{display:block}
   .hint{display:none}
-  .seg button{max-width:42vw}
-  .bubble{max-width:82%}
+  .bubble{max-width:min(82%,calc(30em + 20px))}
 }
 @media (max-width:860px){
   .head-tools{opacity:1}
 }
 @media (max-width:760px){
   .role-bar{padding-bottom:4px}
-  .seg{gap:8px}
-  .seg button{height:32px;font-size:13px;padding:0 13px}
+  .seg{gap:6px}
+  .seg button{height:32px;font-size:11.8px;padding:0 9px}
   .chat-head{flex-wrap:wrap;row-gap:9px;padding-top:12px}
   .head-name{flex:1 1 auto}
   .ops{width:100%;margin-left:0;justify-content:flex-start;gap:7px}
