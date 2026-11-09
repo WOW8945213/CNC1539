@@ -326,35 +326,6 @@ body.pure .role-bar{display:none}
   35%{box-shadow:0 0 0 3px rgba(6,199,85,.55)}
 }
 
-/* ================= 手機 / 窄屏 ================= */
-@media (max-width:859px){
-  .app{max-width:none;box-shadow:none}
-  .side{
-    position:absolute;top:0;right:0;bottom:0;width:min(88vw,320px);flex-basis:auto;z-index:30;
-    box-shadow:-14px 0 40px rgba(0,0,0,.16);display:none;
-  }
-  .side.open{display:block}
-  .hint{display:none}
-  .bubble{max-width:min(82%,calc(30em + 20px))}
-}
-@media (max-width:860px){
-  .head-tools{opacity:1}
-}
-@media (max-width:760px){
-  .role-bar{padding-bottom:4px}
-  .seg{gap:6px}
-  .seg button{height:32px;font-size:11.8px;padding:0 9px}
-  .chat-head{flex-wrap:wrap;row-gap:9px;padding-top:12px}
-  .head-name{flex:1 1 auto}
-  .ops{width:100%;margin-left:0;justify-content:flex-start;gap:7px}
-  .head-shot{max-width:100%}
-  .timebox{right:10px;bottom:74px}
-  .tb-panel{width:214px}
-}
-@media (min-width:860px){
-  .side{display:block}
-  .side.hide{display:none}
-}
 /* ---------- 姓名列右側：原圖貼上的三個按鈕 ---------- */
 .head-shot{
   display:block;flex:0 0 auto;margin-left:auto;
@@ -866,7 +837,7 @@ body.pure .role-bar{display:none}
     renderIdentity(); renderChat(); renderTags(); renderNotes();
   }
 
-  function isNarrow(){ return window.matchMedia('(max-width:859px)').matches; }
+  function isNarrow(){ return false; }
 
   /* ---------- 送出 ---------- */
   function send(){
