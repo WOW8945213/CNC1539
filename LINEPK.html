@@ -141,27 +141,33 @@ input,textarea{font:inherit;color:inherit}
 .day:first-child{margin-top:2px}
 
 .row{display:flex;align-items:flex-end;gap:6px;margin-bottom:12px}
-.row.mine{justify-content:flex-start}
-.row.them{justify-content:flex-end}
+.row.mine{justify-content:flex-end}
+.row.them{justify-content:flex-start}
 .bubble{
   max-width:min(76%,520px);padding:9px 12px;font-size:14px;line-height:1.6;
   white-space:pre-wrap;word-break:break-word;overflow-wrap:anywhere;
   box-shadow:0 1px 0 rgba(0,0,0,.03);
 }
-.row.mine .bubble{background:var(--bubble-mine);border-radius:14px;border-top-left-radius:5px}
-.row.them .bubble{background:var(--bubble-them);border-radius:14px;border-top-right-radius:5px}
+.row.mine .bubble{background:var(--bubble-mine);border-radius:14px;border-top-right-radius:5px}
+.row.them .bubble{background:var(--bubble-them);border-radius:14px;border-top-left-radius:5px}
 .bubble.media{padding:4px;background:#fff!important;border:1px solid #E4E4E4}
 .bubble.media img{display:block;max-width:230px;width:100%;border-radius:11px;cursor:zoom-in}
 .bubble.media.mine-img{background:var(--bubble-mine)!important;border-color:transparent;padding:5px}
 
 .stamp{display:flex;flex-direction:column;margin-top:3px;font-size:11px;color:#A6A6A6;gap:2px}
-.row.mine .stamp{align-items:flex-start;padding-left:2px}
-.row.them .stamp{align-items:flex-end;padding-right:2px}
+.row.mine .stamp{align-items:flex-end;padding-right:2px}
+.row.them .stamp{align-items:flex-start;padding-left:2px}
 .del{
   width:22px;height:22px;border-radius:50%;background:#fff;border:1px solid #E2E2E2;color:#9A9A9A;
   display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .15s;flex:0 0 auto;margin-bottom:16px;
 }
 .del svg{width:12px;height:12px}
+.row.them .msg-ava{
+  width:clamp(24px,6cqw,30px);height:clamp(24px,6cqw,30px);
+  border-radius:50%;overflow:hidden;flex:0 0 auto;align-self:flex-start;
+  background:#F2F2F2;
+}
+.row.them .msg-ava img{width:100%;height:100%;object-fit:cover;display:block}
 .row:hover .del{opacity:1}
 .del:hover{color:#E4573D;border-color:#F0C9C2}
 
@@ -722,8 +728,17 @@ body.pure .role-bar{display:none}
     wrap.appendChild(b);
     wrap.appendChild(stamp);
 
-    if(m.side === 'me'){ row.appendChild(wrap); row.appendChild(del); }
-    else { row.appendChild(del); row.appendChild(wrap); }
+    if(m.side === 'me'){
+      row.appendChild(del); row.appendChild(wrap);
+    }else{
+      const ava = document.createElement('div');
+      ava.className = 'msg-ava';
+      const ai = document.createElement('img');
+      ai.src = state.them.avatar || CAT;
+      ai.alt = state.them.name || '客人';
+      ava.appendChild(ai);
+      row.appendChild(ava); row.appendChild(wrap); row.appendChild(del);
+    }
     return row;
   }
 
@@ -974,7 +989,7 @@ body.pure .role-bar{display:none}
     const f = e.target.files && e.target.files[0];
     if(!f) return;
     compressTo(f, 320, function(url){
-      state.them.avatar = url; save(); renderIdentity(); syncSettings();
+      state.them.avatar = url; save(); renderIdentity(); syncSettings(); renderChat();
       toast('客人頭像已更新');
     });
     e.target.value = '';
