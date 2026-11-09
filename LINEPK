@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LINE 對話模擬器 繁體中文版</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft JhengHei", "PingFang TC", sans-serif;
+        }
+        body {
+            background-color: #f5f6f8;
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+        .chat-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #ffffff;
+        }
+        .top-bar {
+            height: 56px;
+            background: #fff;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            gap: 12px;
+        }
+        .role-switch-wrap {
+            display: flex;
+            gap: 8px;
+        }
+        .role-btn {
+            padding: 6px 14px;
+            border: 1px solid #d0d7e0;
+            border-radius: 20px;
+            background: #fff;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .role-btn.active {
+            background: #06c755;
+            color: #fff;
+            border-color: #06c755;
+        }
+        .chat-header {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 17px;
+            font-weight: 500;
+        }
+        .chat-header .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: #eee;
+        }
+        .chat-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 16px;
+            background: #f7f8fa;
+        }
+        .date-divider {
+            text-align: center;
+            margin: 16px 0;
+            font-size: 13px;
+            color: #888;
+        }
+        .msg-row {
+            display: flex;
+            margin-bottom: 16px;
+            align-items: flex-start;
+            gap: 8px;
+        }
+        .msg-row.customer {
+            justify-content: flex-start;
+        }
+        .msg-row.me {
+            justify-content: flex-end;
+        }
+        .msg-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: #ddd;
+            flex-shrink: 0;
+        }
+        .msg-bubble {
+            max-width: 65%;
+            padding: 10px 14px;
+            border-radius: 16px;
+            font-size: 15px;
+            line-height: 1.5;
+            position: relative;
+            word-break: break-word;
+        }
+        .customer .msg-bubble {
+            background: #ffffff;
+            border: 1px solid #e2e4e8;
+            border-top-left-radius: 4px;
+        }
+        .me .msg-bubble {
+            background: #b2e89c;
+            border-top-right-radius: 4px;
+        }
+        .msg-time {
+            font-size: 11px;
+            color: #999;
+            align-self: flex-end;
+            margin: 0 4px;
+        }
+        .input-area {
+            border-top: 1px solid #e5e7eb;
+            padding: 12px 16px;
+            display: flex;
+            gap: 8px;
+            align-items: flex-end;
+            background: #fff;
+        }
+        .input-box {
+            flex: 1;
+            border: 1px solid #d0d7e0;
+            border-radius: 12px;
+            padding: 10px 12px;
+            min-height: 44px;
+            resize: none;
+            font-size: 15px;
+            font-family: inherit;
+        }
+        .send-btn {
+            background: #06c755;
+            color: white;
+            border: none;
+            padding: 10px 22px;
+            border-radius: 10px;
+            font-size: 15px;
+            cursor: pointer;
+        }
+        .side-panel {
+            width: 360px;
+            background: #fff;
+            border-left: 1px solid #e5e7eb;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+        .panel-header {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid #f0f1f3;
+        }
+        .panel-avatar {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 10px;
+            background: #eee;
+        }
+        .panel-name {
+            font-size: 20px;
+            font-weight: 600;
+        }
+        .panel-sub {
+            font-size: 14px;
+            color: #777;
+            margin-top: 4px;
+        }
+        .panel-section {
+            padding: 16px 20px;
+            border-bottom: 1px solid #f0f1f3;
+        }
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .edit-icon {
+            cursor: pointer;
+            color: #06c755;
+            font-size: 16px;
+        }
+        .form-row {
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        .form-row label {
+            color: #666;
+            display: inline-block;
+            min-width: 110px;
+        }
+        .form-row input {
+            border: none;
+            outline: none;
+            font-size: 14px;
+            width: calc(100% - 120px);
+            padding: 4px 0;
+            border-bottom: 1px dashed #ddd;
+        }
+        .hidden-file {
+            display: none;
+        }
+        .btn {
+            padding: 6px 12px;
+            border-radius: 8px;
+            border: 1px solid #d0d7e0;
+            background: #fff;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        .btn-primary {
+            background: #06c755;
+            color: #fff;
+            border-color: #06c755;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-main">
+        <div class="top-bar">
+            <div class="role-switch-wrap">
+                <button class="role-btn active" id="btnMe">我（業務）發訊</button>
+                <button class="role-btn" id="btnCustomer">客人發訊</button>
+            </div>
+            <div class="chat-header">
+                <img class="avatar" id="headerAvatar" src="" alt="頭像">
+                <span id="headerName">Kun（胖8.25）</span>
+            </div>
+        </div>
+        <div class="chat-scroll" id="chatScroll">
+            <div class="date-divider">10/27（二）</div>
+        </div>
+        <div class="input-area">
+            <textarea class="input-box" id="msgInput" placeholder="Enter：傳送 / Shift + Enter：換行"></textarea>
+            <button class="send-btn" id="sendBtn">傳送</button>
+        </div>
+    </div>
+
+    <div class="side-panel">
+        <div class="panel-header">
+            <img class="panel-avatar" id="panelAvatar" src="" alt="客人頭像">
+            <div class="panel-name" id="panelName">Kun（胖8.25）</div>
+            <div class="panel-sub" id="panelSub">(Kun)</div>
+            <div style="margin-top:12px;">
+                <button class="btn" id="uploadAvatarBtn">更換客人頭像</button>
+                <input type="file" id="avatarFile" class="hidden-file" accept="image/*">
+            </div>
+        </div>
+        <div class="panel-section">
+            <div class="section-title">負責人員 <span class="edit-icon">✎</span></div>
+            <div class="form-row">
+                <input type="text" id="staffName" value="高啓文（小胖）">
+            </div>
+        </div>
+        <div class="panel-section">
+            <div class="section-title">記事本 1/1 <span class="edit-icon">+</span></div>
+            <div class="form-row"><label>姓名：</label><input id="memName" value="黃巳坤"></div>
+            <div class="form-row"><label>年齡：</label><input id="memAge" value="22"></div>
+            <div class="form-row"><label>居住地：</label><input id="memAddr" value="新北市"></div>
+            <div class="form-row"><label>LINE ID：</label><input id="memLineId" value="jerry4999"></div>
+            <div class="form-row"><label>手機號碼：</label><input id="memPhone" value="0981021949"></div>
+            <div class="form-row"><label>需求金額：</label><input id="memMoney" value="30萬 - 50萬"></div>
+            <div class="form-row"><label>身分證字號：</label><input id="memIdNo" value="F131541210"></div>
+            <div class="form-row"><label>銀行警示戶：</label><input id="memWarn" value="否"></div>
+            <div class="form-row"><label>個人外幣帳戶：</label><input id="memForex" value="是"></div>
+            <div class="form-row"><label>信貸/房貸/汽貸/機車：</label><input id="memLoan" value="無 121"></div>
+        </div>
+        <div class="panel-section">
+            <button class="btn btn-primary" id="saveAll">儲存全部設定</button>
+        </div>
+    </div>
+
+<script>
+    let currentRole = "me";
+    const btnMe = document.getElementById("btnMe");
+    const btnCustomer = document.getElementById("btnCustomer");
+    const chatScroll = document.getElementById("chatScroll");
+    const msgInput = document.getElementById("msgInput");
+    const sendBtn = document.getElementById("sendBtn");
+    const headerName = document.getElementById("headerName");
+    const panelName = document.getElementById("panelName");
+    const headerAvatar = document.getElementById("headerAvatar");
+    const panelAvatar = document.getElementById("panelAvatar");
+    const uploadAvatarBtn = document.getElementById("uploadAvatarBtn");
+    const avatarFile = document.getElementById("avatarFile");
+
+    function switchRole(role) {
+        currentRole = role;
+        if (role === "me") {
+            btnMe.classList.add("active");
+            btnCustomer.classList.remove("active");
+        } else {
+            btnCustomer.classList.add("active");
+            btnMe.classList.remove("active");
+        }
+    }
+    btnMe.onclick = () => switchRole("me");
+    btnCustomer.onclick = () => switchRole("customer");
+
+    function addMessage(text) {
+        if (!text.trim()) return;
+        const row = document.createElement("div");
+        row.className = "msg-row " + currentRole;
+
+        const avatar = document.createElement("img");
+        avatar.className = "msg-avatar";
+        avatar.src = panelAvatar.src;
+
+        const bubble = document.createElement("div");
+        bubble.className = "msg-bubble";
+        bubble.innerText = text;
+
+        const time = document.createElement("span");
+        const now = new Date();
+        time.innerText = now.getHours() + ":" + String(now.getMinutes()).padStart(2,"0");
+        time.className = "msg-time";
+
+        if (currentRole === "customer") {
+            row.appendChild(avatar);
+            row.appendChild(bubble);
+            row.appendChild(time);
+        } else {
+            row.appendChild(time);
+            row.appendChild(bubble);
+        }
+        chatScroll.appendChild(row);
+        chatScroll.scrollTop = chatScroll.scrollHeight;
+    }
+
+    sendBtn.onclick = () => {
+        addMessage(msgInput.value);
+        msgInput.value = "";
+    };
+    msgInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            addMessage(msgInput.value);
+            msgInput.value = "";
+        }
+    });
+
+    uploadAvatarBtn.onclick = () => avatarFile.click();
+    avatarFile.onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            const src = ev.target.result;
+            panelAvatar.src = src;
+            headerAvatar.src = src;
+            localStorage.setItem("customerAvatar", src);
+        };
+        reader.readAsDataURL(file);
+    };
+
+    document.getElementById("saveAll").onclick = () => {
+        const data = {
+            panelName: panelName.innerText,
+            panelSub: document.getElementById("panelSub").innerText,
+            staffName: document.getElementById("staffName").value,
+            memName: document.getElementById("memName").value,
+            memAge: document.getElementById("memAge").value,
+            memAddr: document.getElementById("memAddr").value,
+            memLineId: document.getElementById("memLineId").value,
+            memPhone: document.getElementById("memPhone").value,
+            memMoney: document.getElementById("memMoney").value,
+            memIdNo: document.getElementById("memIdNo").value,
+            memWarn: document.getElementById("memWarn").value,
+            memForex: document.getElementById("memForex").value,
+            memLoan: document.getElementById("memLoan").value
+        };
+        localStorage.setItem("lineSimData", JSON.stringify(data));
+        alert("✅ 已儲存！");
+    };
+
+    window.onload = () => {
+        const savedAvatar = localStorage.getItem("customerAvatar");
+        if (savedAvatar) {
+            panelAvatar.src = savedAvatar;
+            headerAvatar.src = savedAvatar;
+        }
+        const saved = localStorage.getItem("lineSimData");
+        if (saved) {
+            const d = JSON.parse(saved);
+            headerName.innerText = d.panelName;
+            panelName.innerText = d.panelName;
+            document.getElementById("staffName").value = d.staffName;
+            document.getElementById("memName").value = d.memName;
+            document.getElementById("memAge").value = d.memAge;
+            document.getElementById("memAddr").value = d.memAddr;
+            document.getElementById("memLineId").value = d.memLineId;
+            document.getElementById("memPhone").value = d.memPhone;
+            document.getElementById("memMoney").value = d.memMoney;
+            document.getElementById("memIdNo").value = d.memIdNo;
+            document.getElementById("memWarn").value = d.memWarn;
+            document.getElementById("memForex").value = d.memForex;
+            document.getElementById("memLoan").value = d.memLoan;
+        }
+        addMessage("打擾了！想請問您這邊貸款到款項了嗎？需要協助您申貸嗎？");
+    };
+</script>
+</body>
+</html>
