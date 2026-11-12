@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<title>LINE對話模擬器</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif}
+body{background:#e9e9e9;padding:20px;display:flex;gap:20px;height:calc(100vh - 40px);overflow:hidden}
+.chat-wrap{flex:1;background:#fff;border-radius:12px;display:flex;flex-direction:column;position:relative}
+.chat-header{padding:12px 16px;border-bottom:1px solid #eee;display:flex;align-items:center;gap:10px}
+.avatar{width:40px;height:40px;border-radius:50%;object-fit:cover;border:1px solid #ddd}
+.chat-name{font-size:16px;font-weight:500}
+.chat-box{flex:1;padding:16px;overflow-y:auto;background:#f1f1f1}
+.msg-item{margin-bottom:12px;display:flex;gap:8px;align-items:flex-start}
+.msg-customer{justify-content:flex-start}
+.msg-self{justify-content:flex-end}
+.msg-customer .msg-bubble{background:#fff;border-radius:12px 12px 12px 4px;white-space:pre-wrap;max-width:calc(30ch * 1.05);line-height:1.5}
+.msg-self .msg-bubble{background:#54e360;color:#000;border-radius:12px 12px 4px 12px;white-space:pre-wrap;max-width:calc(30ch * 1.05);line-height:1.5}
+.msg-avatar{width:36px;height:36px;border-radius:50%;object-fit:cover}
+.msg-time{font-size:11px;color:#777;margin-top:4px;text-align:right}
+.input-area{padding:12px 16px;border-top:1px solid #eee;display:flex;gap:8px;align-items:center}
+textarea{flex:1;border:1px solid #ddd;border-radius:8px;padding:8px;resize:none;height:44px;font-size:14px}
+.btn{padding:8px 14px;border:none;border-radius:8px;cursor:pointer;font-size:14px}
+.btn-customer{background:#fff;color:#333;border:1px solid #ccc}
+.btn-self{background:#54e360;color:#000}
+.btn-clear{position:absolute;bottom:16px;right:16px;background:#ff4444;color:#fff;border:none;padding:8px 12px;border-radius:8px;z-index:10}
+.side-panel{width:280px;background:#fff;border-radius:12px;padding:16px;overflow-y:auto}
+.side-item{margin-bottom:14px}
+.side-item label{display:block;margin-bottom:4px;font-size:14px;color:#444}
+.side-item input{width:100%;padding:7px;border:1px solid #ddd;border-radius:6px}
+</style>
+</head>
+<body>
+<div class="chat-wrap">
+  <div class="chat-header">
+    <img id="customerAvatarHead" class="avatar" src="https://via.placeholder.com/40">
+    <div id="customerNameHead" class="chat-name">客人</div>
+  </div>
+  <div class="chat-box" id="chatBox"></div>
+  <div class="input-area">
+    <textarea id="msgInput" placeholder="輸入訊息..."></textarea>
+    <button class="btn btn-customer" onclick="sendCustomer()">客人發訊</button>
+    <button class="btn btn-self" onclick="sendSelf()">業務發訊</button>
+  </div>
+  <button class="btn-clear" onclick="clearAll()">一鍵清除全部對話</button>
+</div>
+
+<div class="side-panel">
+  <div class="side-item">
+    <label>客人名稱</label>
+    <input id="customerName" value="客人" oninput="updateHeadName()">
+  </div>
+  <div class="side-item">
+    <label>客人頭像網址</label>
+    <input id="customerAvatarUrl" value="https://via.placeholder.com/40" oninput="updateHeadAvatar()">
+  </div>
+  <div class="side-item">
+    <label>自訂時間(預設現在)</label>
+    <input id="customTime" placeholder="如 14:30">
+  </div>
+</div>
+
+<script>
+const chatBox = document.getElementById('chatBox');
+const msgInput = document.getElementById('msgInput');
+const customerNameEl = document.getElementById('customerNameHead');
+const customerAvatarHeadEl = document.getElementById('customerAvatarHead');
+const customerNameInput = document.getElementById('customerName');
+const customerAvatarInput = document.getElementById('customerAvatarUrl');
+const timeInput = document.getElementById('customTime');
+
+function updateHeadName(){
+  customerNameEl.innerText = customerNameInput.value;
+}
+function updateHeadAvatar(){
+  customerAvatarHeadEl.src = customerAvatarInput.value;
+}
+function getTime(){
+  const t = timeInput.value.trim();
+  if(t) return t;
+  const d = new Date();
+  return String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+}
+
+function sendCustomer(){
+  const text = msgInput.value.trim();
+  if(!text) return;
+  const html = `
+  <div class="msg-item msg-customer">
+    <img class="msg-avatar" src="${customerAvatarInput.value}">
+    <div>
+      <div class="msg-bubble">${escapeHtml(text)}</div>
+      <div class="msg-time">${getTime()}</div>
+    </div>
+  </div>`;
+  chatBox.insertAdjacentHTML('beforeend', html);
+  msgInput.value = '';
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
+function sendSelf(){
+  const text = msgInput.value.trim();
+  if(!text) return;
+  const html = `
+  <div class="msg-item msg-self">
+    <div>
+      <div class="msg-bubble">${escapeHtml(text)}</div>
+      <div class="msg-time">${getTime()}</div>
+    </div>
+  </div>`;
+  chatBox.insertAdjacentHTML('beforeend', html);
+  msgInput.value = '';
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
+function clearAll(){
+  if(confirm('確定要清除全部對話嗎？')){
+    chatBox.innerHTML = '';
+  }
+}
+function escapeHtml(str){
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
+</body>
+</html>
