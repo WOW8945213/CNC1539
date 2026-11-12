@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LINE貸款對話模擬器 v3 可改名稱頭像+日期分隔</title>
+<title>LINE貸款對話模擬器 v5 可編輯刪除訊息</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;font-family:"Microsoft JhengHei",sans-serif;}
 body{background:#f5f6f8;height:100vh;display:flex;flex-direction:column;overflow:hidden;}
@@ -18,22 +18,26 @@ body{background:#f5f6f8;height:100vh;display:flex;flex-direction:column;overflow
 .chat-header{background:#fff;padding:14px 18px;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;gap:10px;}
 .chat-header .avatar{width:36px;height:36px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;}
 .chat-header .avatar img{width:100%;height:100%;object-fit:cover;}
-.chat-header .name{font-size:17px;font-weight:bold;color:#222;cursor:text;}
+.chat-header .name{font-size:17px;font-weight:bold;color:#222;}
+.speaker-icon{font-size:16px;color:#777;}
 .header-btns{margin-left:auto;display:flex;gap:8px;}
-.h-btn{padding:6px 12px;border:1px solid #d0d3d8;border-radius:6px;background:#fff;font-size:13px;cursor:pointer;}
+.h-btn{padding:6px 12px;border:1px solid #d0d3d8;border-radius:6px;background:#fff;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:4px;}
 .chat-scroll{flex:1;overflow-y:auto;padding:20px 24px;display:flex;flex-direction:column;gap:14px;}
 .date-divider{align-self:center;background:#dcdfe3;color:#555;padding:6px 18px;border-radius:20px;font-size:14px;margin:8px 0;}
-.msg-row{display:flex;gap:8px;align-items:flex-end;}
+.msg-row{display:flex;gap:8px;align-items:flex-end;position:relative;}
 .msg-row.right{flex-direction:row-reverse;}
 .msg-avatar{width:32px;height:32px;border-radius:50%;overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:15px;}
 .msg-avatar img{width:100%;height:100%;object-fit:cover;}
-.bubble{max-width:65%;padding:10px 14px;border-radius:16px;font-size:14.5px;line-height:1.5;white-space:pre-wrap;word-break:break-word;}
+.bubble{max-width:65%;padding:10px 14px;border-radius:16px;font-size:14.5px;line-height:1.5;white-space:pre-wrap;word-break:break-word;cursor:pointer;}
 .msg-row.left .bubble{background:#ffffff;border:1px solid #e4e6e8;border-bottom-left-radius:4px;}
 .msg-row.right .bubble{background:#b3d8ff;border-bottom-right-radius:4px;}
 .sys-notice{align-self:center;background:#dcdfe3;color:#555;padding:10px 24px;border-radius:16px;text-align:center;font-size:14px;}
 .time-label{font-size:11px;color:#888;margin-top:4px;}
 .msg-row.right .time-label{text-align:right;}
 .read-mark{font-size:11px;color:#777;margin-right:4px;align-self:center;}
+.msg-menu{position:absolute;background:#fff;border:1px solid #ddd;border-radius:8px;box-shadow:0 3px 10px #0002;z-index:99;display:none;min-width:110px;}
+.msg-menu button{width:100%;padding:8px 12px;border:none;background:none;text-align:left;font-size:14px;cursor:pointer;}
+.msg-menu button:hover{background:#f0f2f5;}
 .input-bar{background:#fff;border-top:1px solid #e5e7eb;padding:12px 16px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
 .input-bar textarea{flex:1;min-width:220px;border:1px solid #d6d9dd;border-radius:8px;padding:10px;font-size:14px;resize:none;height:44px;outline:none;}
 .datetime-wrap{display:flex;align-items:center;gap:4px;font-size:13px;color:#444;}
@@ -71,10 +75,11 @@ body{background:#f5f6f8;height:100vh;display:flex;flex-direction:column;overflow
     <div class="chat-header">
       <div class="avatar" id="chatHeaderAvatar">🐱</div>
       <div class="name" id="chatHeaderName">Kun (胖8.25)</div>
+      <span class="speaker-icon">🔊</span>
       <div class="header-btns">
-        <button class="h-btn">待處理</button>
-        <button class="h-btn">處理完畢</button>
-        <button class="h-btn">搜尋</button>
+        <button class="h-btn">💬 待處理</button>
+        <button class="h-btn">✔ 處理完畢</button>
+        <button class="h-btn">🔍 搜尋</button>
       </div>
     </div>
     <div class="chat-scroll" id="chatBox"></div>
@@ -114,10 +119,18 @@ LINE ID：jerry4999
   </div>
 </div>
 
+<!-- 訊息右鍵/點擊選單 -->
+<div class="msg-menu" id="msgMenu">
+  <button onclick="editMsg()">✏️ 編輯</button>
+  <button onclick="delMsg()">🗑️ 刪除</button>
+</div>
+
 <script>
 let currentRole = "agent";
 let clientName = "Kun (胖8.25)";
 let avatarImgSrc = null;
+let activeMsgRow = null;
+
 const roleAgentBtn = document.getElementById("roleAgent");
 const roleClientBtn = document.getElementById("roleClient");
 const chatBox = document.getElementById("chatBox");
@@ -131,6 +144,7 @@ const sidePName = document.getElementById("sidePName");
 const chatHeaderAvatar = document.getElementById("chatHeaderAvatar");
 const sideBigAvatar = document.getElementById("sideBigAvatar");
 const avatarFile = document.getElementById("avatarFile");
+const msgMenu = document.getElementById("msgMenu");
 
 roleAgentBtn.onclick = ()=>switchRole("agent");
 roleClientBtn.onclick = ()=>switchRole("client");
@@ -142,7 +156,6 @@ function switchRole(role){
   msgInput.focus();
 }
 
-// 修改客人名稱
 function renameClient(){
   const newName = prompt("請輸入新的客人名稱：", clientName);
   if(newName && newName.trim()){
@@ -152,7 +165,6 @@ function renameClient(){
   }
 }
 
-// 更換頭像
 avatarFile.onchange = function(e){
   const file = e.target.files[0];
   if(!file) return;
@@ -165,7 +177,6 @@ avatarFile.onchange = function(e){
   reader.readAsDataURL(file);
 }
 
-// 計算星期 二=二
 function getWeekday(month, day){
   const date = new Date(2026, month-1, day);
   const weekArr = ["日","一","二","三","四","五","六"];
@@ -188,7 +199,6 @@ function sendMessage(){
 }
 
 function addMessage(text, role, timeStr, dateLabel){
-  // 如果上一則沒有同日期分隔，就插入日期標籤
   const lastDivider = chatBox.querySelector(".date-divider:last-child");
   let needDivider = true;
   if(lastDivider && lastDivider.innerText === dateLabel){
@@ -218,6 +228,16 @@ function addMessage(text, role, timeStr, dateLabel){
   const bubble = document.createElement("div");
   bubble.className = "bubble";
   bubble.innerText = text;
+
+  // 點擊氣泡彈出選單
+  bubble.onclick = function(ev){
+    ev.stopPropagation();
+    activeMsgRow = row;
+    msgMenu.style.display = "block";
+    msgMenu.style.left = ev.clientX + "px";
+    msgMenu.style.top = ev.clientY + "px";
+  }
+
   const timeLbl = document.createElement("div");
   timeLbl.className = "time-label";
   timeLbl.innerText = timeStr;
@@ -235,7 +255,38 @@ function addMessage(text, role, timeStr, dateLabel){
   chatBox.scrollTop = chatBox.scrollHeight;
 }
 
-// 新增系統通知：用戶已將您加入好友
+// 編輯訊息
+function editMsg(){
+  if(!activeMsgRow) return;
+  const bubble = activeMsgRow.querySelector(".bubble");
+  const oldText = bubble.innerText;
+  const newText = prompt("編輯訊息：", oldText);
+  if(newText !== null){
+    bubble.innerText = newText;
+  }
+  msgMenu.style.display = "none";
+  activeMsgRow = null;
+}
+
+// 刪除訊息
+function delMsg(){
+  if(!activeMsgRow) return;
+  if(!confirm("確定刪除這則訊息？")){
+    msgMenu.style.display = "none";
+    activeMsgRow = null;
+    return;
+  }
+  activeMsgRow.remove();
+  msgMenu.style.display = "none";
+  activeMsgRow = null;
+}
+
+// 點空白處關閉選單
+document.addEventListener("click", function(){
+  msgMenu.style.display = "none";
+  activeMsgRow = null;
+});
+
 function addSystemNotice(timeStr, text){
   const notice = document.createElement("div");
   notice.className = "sys-notice";
@@ -244,7 +295,7 @@ function addSystemNotice(timeStr, text){
   chatBox.scrollTop = chatBox.scrollHeight;
 }
 
-// 預載範例對話
+// 預載開場對話
 const initDateLabel = "8/25 (二)";
 const divider = document.createElement("div");
 divider.className = "date-divider";
