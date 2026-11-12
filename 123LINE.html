@@ -33,8 +33,9 @@ body{background:#f5f6f8;height:100vh;display:flex;flex-direction:column;overflow
 .msg-row.right .bubble-wrap{align-items:flex-end;}
 .bubble{display:inline-block;width:fit-content;max-width:100%;padding:10px 14px;border-radius:16px;font-size:14.5px;line-height:1.5;white-space:pre-wrap;overflow-wrap:break-word;word-break:break-word;cursor:pointer;}
 .bubble-line{display:block;white-space:pre-wrap;overflow-wrap:break-word;word-break:break-word;}
-.msg-row.left .bubble{background:#ffffff;border:1px solid #e4e6e8;border-bottom-left-radius:4px;}
+.msg-row.left .bubble{background:#f2f3f5;border:1px solid #dfe1e4;border-bottom-left-radius:4px;}
 .msg-row.right .bubble{background:#c8f0c8;border-bottom-right-radius:4px;}
+.msg-row.right .msg-avatar{display:none;}
 .sys-notice{align-self:center;background:#dcdfe3;color:#555;padding:10px 24px;border-radius:16px;text-align:center;font-size:14px;}
 .time-label{font-size:11px;color:#888;margin-top:4px;}
 .msg-menu{position:absolute;background:#fff;border:1px solid #ddd;border-radius:8px;box-shadow:0 3px 10px #0002;z-index:99;display:none;min-width:110px;}
@@ -230,8 +231,6 @@ function addMessage(text, role, timeStr, dateLabel){
     }else{
       avatar.innerText = "🐱";
     }
-  }else{
-    avatar.innerText = "👤";
   }
   const bubbleWrap = document.createElement("div");
   bubbleWrap.className = "bubble-wrap";
