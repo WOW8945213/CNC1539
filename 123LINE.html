@@ -2,144 +2,198 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
-<title>LINE對話模擬器</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LINE 貸款對話模擬器（可調發訊時間）</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif}
-body{background:#e9e9e9;padding:20px;display:flex;gap:20px;height:calc(100vh - 40px);overflow:hidden}
-.chat-wrap{flex:1;background:#fff;border-radius:12px;display:flex;flex-direction:column;position:relative}
-.chat-header{padding:12px 16px;border-bottom:1px solid #eee;display:flex;align-items:center;gap:10px}
-.avatar{width:40px;height:40px;border-radius:50%;object-fit:cover;border:1px solid #ddd}
-.chat-name{font-size:16px;font-weight:500}
-.chat-box{flex:1;padding:16px;overflow-y:auto;background:#f1f1f1}
-.msg-item{margin-bottom:12px;display:flex;gap:8px;align-items:flex-start}
-.msg-customer{justify-content:flex-start}
-.msg-self{justify-content:flex-end}
-.msg-customer .msg-bubble{
-  background:#fff;
-  border-radius:12px 12px 12px 4px;
-  white-space:nowrap;
-  line-height:1.5
-}
-.msg-self .msg-bubble{
-  background:#54e360;
-  color:#000;
-  border-radius:12px 12px 4px 12px;
-  white-space:nowrap;
-  line-height:1.5
-}
-.msg-avatar{width:36px;height:36px;border-radius:50%;object-fit:cover}
-.msg-time{font-size:11px;color:#777;margin-top:4px;text-align:right}
-.input-area{padding:12px 16px;border-top:1px solid #eee;display:flex;gap:8px;align-items:center}
-textarea{flex:1;border:1px solid #ddd;border-radius:8px;padding:8px;resize:none;height:44px;font-size:14px}
-.btn{padding:8px 14px;border:none;border-radius:8px;cursor:pointer;font-size:14px}
-.btn-customer{background:#fff;color:#333;border:1px solid #ccc}
-.btn-self{background:#54e360;color:#000}
-.btn-clear{
-  position:absolute;
-  bottom:16px;
-  right:16px;
-  background:#ff4444;
-  color:#fff;
-  border:none;
-  padding:8px 12px;
-  border-radius:8px;
-  z-index:10;
-  cursor:pointer
-}
-.side-panel{width:280px;background:#fff;border-radius:12px;padding:16px;overflow-y:auto}
-.side-item{margin-bottom:14px}
-.side-item label{display:block;margin-bottom:4px;font-size:14px;color:#444}
-.side-item input{width:100%;padding:7px;border:1px solid #ddd;border-radius:6px}
+*{box-sizing:border-box;margin:0;padding:0;font-family:"Microsoft JhengHei",sans-serif;}
+body{background:#f5f6f8;height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+.top-bar{background:#fff;border-bottom:1px solid #e5e7eb;padding:10px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.top-bar h3{font-size:16px;color:#222;margin-right:8px;}
+.role-btn{padding:7px 16px;border-radius:20px;border:1px solid #ccd0d5;cursor:pointer;font-size:14px;background:#fff;transition:all .2s;}
+.role-btn.active{background:#06c755;color:#fff;border-color:#06c755;font-weight:bold;}
+.role-btn:hover{opacity:.85;}
+.ctrl-group{margin-left:auto;display:flex;gap:8px;}
+.ctrl-btn{padding:6px 12px;border:1px solid #ccc;border-radius:6px;background:#fff;cursor:pointer;font-size:13px;}
+.ctrl-btn:hover{background:#f0f0f0;}
+.main-wrap{flex:1;display:flex;overflow:hidden;}
+.chat-area{flex:1;display:flex;flex-direction:column;background:#f7f8fa;position:relative;}
+.chat-header{background:#fff;padding:14px 18px;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;gap:10px;}
+.chat-header .avatar{width:36px;height:36px;border-radius:50%;background:#e8e8e8;display:flex;align-items:center;justify-content:center;font-size:18px;}
+.chat-header .name{font-size:17px;font-weight:bold;color:#222;}
+.header-btns{margin-left:auto;display:flex;gap:8px;}
+.h-btn{padding:6px 12px;border:1px solid #d0d3d8;border-radius:6px;background:#fff;font-size:13px;cursor:pointer;}
+.chat-scroll{flex:1;overflow-y:auto;padding:20px 24px;display:flex;flex-direction:column;gap:14px;}
+.msg-row{display:flex;gap:8px;align-items:flex-end;}
+.msg-row.right{flex-direction:row-reverse;}
+.msg-avatar{width:32px;height:32px;border-radius:50%;background:#ddd;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:15px;}
+.bubble{max-width:65%;padding:10px 14px;border-radius:16px;font-size:14.5px;line-height:1.5;position:relative;white-space:pre-wrap;word-break:break-word;}
+.msg-row.left .bubble{background:#ffffff;border:1px solid #e4e6e8;border-bottom-left-radius:4px;}
+.msg-row.right .bubble{background:#b3d8ff;border-bottom-right-radius:4px;}
+.time-label{font-size:11px;color:#888;margin-top:4px;}
+.msg-row.right .time-label{text-align:right;}
+.read-mark{font-size:11px;color:#777;margin-right:4px;align-self:center;}
+.input-bar{background:#fff;border-top:1px solid #e5e7eb;padding:12px 16px;display:flex;align-items:center;gap:10px;}
+.input-bar textarea{flex:1;border:1px solid #d6d9dd;border-radius:8px;padding:10px;font-size:14px;resize:none;height:44px;outline:none;}
+.time-input-wrap{display:flex;align-items:center;gap:6px;font-size:13px;color:#444;}
+#customTime{width:80px;padding:8px;border:1px solid #d6d9dd;border-radius:6px;font-size:14px;}
+.send-btn{background:#06c755;color:white;border:none;padding:10px 22px;border-radius:8px;font-size:15px;cursor:pointer;font-weight:bold;}
+.send-btn:hover{background:#05b34c;}
+.side-panel{width:280px;background:#fff;border-left:1px solid #e5e7eb;display:flex;flex-direction:column;overflow-y:auto;}
+.side-profile{padding:18px;border-bottom:1px solid #eee;}
+.side-profile .big-avatar{width:64px;height:64px;border-radius:50%;background:#e9e9e9;margin-bottom:10px;display:flex;align-items:center;justify-content:center;font-size:30px;}
+.side-profile .pname{font-size:19px;font-weight:bold;}
+.tag-line{margin-top:14px;color:#22c55e;font-size:14px;cursor:pointer;}
+.owner-line{margin-top:16px;font-size:14px;color:#444;display:flex;align-items:center;gap:8px;}
+.notes-title{padding:14px 18px;font-size:16px;font-weight:bold;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center;}
+.notes-box{padding:16px;}
+.notes-box textarea{width:100%;min-height:260px;border:1px solid #e0e0e0;border-radius:6px;padding:10px;font-size:14px;line-height:1.6;resize:vertical;outline:none;}
+.note-meta{margin-top:10px;font-size:12px;color:#888;}
 </style>
 </head>
 <body>
-<div class="chat-wrap">
-  <div class="chat-header">
-    <img id="customerAvatarHead" class="avatar" src="https://via.placeholder.com/40">
-    <div id="customerNameHead" class="chat-name">客人</div>
+<div class="top-bar">
+  <h3>角色切換：</h3>
+  <button class="role-btn active" id="roleAgent">業務(我方) ✉️</button>
+  <button class="role-btn" id="roleClient">客人(Kun) ✉️</button>
+  <div class="ctrl-group">
+    <button class="ctrl-btn" onclick="clearAll()">清空對話</button>
+    <button class="ctrl-btn" onclick="exportData()">匯出</button>
   </div>
-  <div class="chat-box" id="chatBox"></div>
-  <div class="input-area">
-    <textarea id="msgInput" placeholder="輸入訊息..."></textarea>
-    <button class="btn btn-customer" onclick="sendCustomer()">客人發訊</button>
-    <button class="btn btn-self" onclick="sendSelf()">業務發訊</button>
-  </div>
-  <button class="btn-clear" onclick="clearAll()">一鍵清除全部對話</button>
 </div>
 
-<div class="side-panel">
-  <div class="side-item">
-    <label>客人名稱</label>
-    <input id="customerName" value="客人" oninput="updateHeadName()">
+<div class="main-wrap">
+  <div class="chat-area">
+    <div class="chat-header">
+      <div class="avatar">🐱</div>
+      <div class="name">Kun (胖8.25)</div>
+      <div class="header-btns">
+        <button class="h-btn">待處理</button>
+        <button class="h-btn">處理完畢</button>
+        <button class="h-btn">搜尋</button>
+      </div>
+    </div>
+    <div class="chat-scroll" id="chatBox"></div>
+    <div class="input-bar">
+      <textarea id="msgInput" placeholder="Enter 傳送 / Shift + Enter 換行"></textarea>
+      <div class="time-input-wrap">
+        <span>時間</span>
+        <input type="text" id="customTime" value="20:00" placeholder="HH:MM">
+      </div>
+      <button class="send-btn" onclick="sendMessage()">傳送</button>
+    </div>
   </div>
-  <div class="side-item">
-    <label>客人頭像網址</label>
-    <input id="customerAvatarUrl" value="https://via.placeholder.com/40" oninput="updateHeadAvatar()">
-  </div>
-  <div class="side-item">
-    <label>自訂時間(預設現在)</label>
-    <input id="customTime" placeholder="如 14:30">
+
+  <div class="side-panel">
+    <div class="side-profile">
+      <div class="big-avatar">🐱</div>
+      <div class="pname">Kun (胖8.25)</div>
+      <div class="tag-line">＋新增標籤</div>
+      <div class="owner-line">負責人員　高啟文(小胖)</div>
+    </div>
+    <div class="notes-title">記事本 1/1 <span style="color:#22c55e">＋</span></div>
+    <div class="notes-box">
+      <textarea id="noteBox">姓名：黃巳坤
+年齡：22
+居住地：新北市
+LINE ID：jerry4999
+手機號碼：0981021949
+需求金額：30萬 - 50萬
+身分證字號：F131541210
+銀行警示戶：否
+個人外幣帳戶：是
+信貸/房貸/汽貸/機車：無 121</textarea>
+      <div class="note-meta">2026/8/25 19:59 Unknown</div>
+    </div>
   </div>
 </div>
 
 <script>
-const chatBox = document.getElementById('chatBox');
-const msgInput = document.getElementById('msgInput');
-const customerNameEl = document.getElementById('customerNameHead');
-const customerAvatarHeadEl = document.getElementById('customerAvatarHead');
-const customerNameInput = document.getElementById('customerName');
-const customerAvatarInput = document.getElementById('customerAvatarUrl');
-const timeInput = document.getElementById('customTime');
+let currentRole = "agent";
+const roleAgentBtn = document.getElementById("roleAgent");
+const roleClientBtn = document.getElementById("roleClient");
+const chatBox = document.getElementById("chatBox");
+const msgInput = document.getElementById("msgInput");
+const customTimeInput = document.getElementById("customTime");
 
-function updateHeadName(){
-  customerNameEl.innerText = customerNameInput.value;
+roleAgentBtn.onclick = ()=>switchRole("agent");
+roleClientBtn.onclick = ()=>switchRole("client");
+
+function switchRole(role){
+  currentRole = role;
+  roleAgentBtn.classList.toggle("active", role==="agent");
+  roleClientBtn.classList.toggle("active", role==="client");
+  msgInput.focus();
 }
-function updateHeadAvatar(){
-  customerAvatarHeadEl.src = customerAvatarInput.value;
+
+function sendMessage(){
+  const txt = msgInput.value.trim();
+  if(!txt) return;
+  const timeStr = customTimeInput.value.trim() || getNowTime();
+  addMessage(txt, currentRole, timeStr);
+  msgInput.value = "";
+  msgInput.focus();
 }
-function getTime(){
-  const t = timeInput.value.trim();
-  if(t) return t;
+
+function getNowTime(){
   const d = new Date();
-  return String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+  return String(d.getHours()).padStart(2,"0") + ":" + String(d.getMinutes()).padStart(2,"0");
 }
 
-function sendCustomer(){
-  const text = msgInput.value.trim();
-  if(!text) return;
-  const html = `
-  <div class="msg-item msg-customer">
-    <img class="msg-avatar" src="${customerAvatarInput.value}">
-    <div>
-      <div class="msg-bubble">${escapeHtml(text)}</div>
-      <div class="msg-time">${getTime()}</div>
-    </div>
-  </div>`;
-  chatBox.insertAdjacentHTML('beforeend', html);
-  msgInput.value = '';
-  chatBox.scrollTop = chatBox.scrollHeight;
-}
-function sendSelf(){
-  const text = msgInput.value.trim();
-  if(!text) return;
-  const html = `
-  <div class="msg-item msg-self">
-    <div>
-      <div class="msg-bubble">${escapeHtml(text)}</div>
-      <div class="msg-time">${getTime()}</div>
-    </div>
-  </div>`;
-  chatBox.insertAdjacentHTML('beforeend', html);
-  msgInput.value = '';
-  chatBox.scrollTop = chatBox.scrollHeight;
-}
-function clearAll(){
-  if(confirm('確定要清除全部對話嗎？')){
-    chatBox.innerHTML = '';
+function addMessage(text, role, timeStr){
+  const row = document.createElement("div");
+  row.className = "msg-row " + (role==="agent" ? "right" : "left");
+  const avatar = document.createElement("div");
+  avatar.className = "msg-avatar";
+  avatar.innerText = role==="agent" ? "👤" : "🐱";
+  const bubbleWrap = document.createElement("div");
+  const bubble = document.createElement("div");
+  bubble.className = "bubble";
+  bubble.innerText = text;
+  const timeLbl = document.createElement("div");
+  timeLbl.className = "time-label";
+  timeLbl.innerText = timeStr;
+  bubbleWrap.appendChild(bubble);
+  bubbleWrap.appendChild(timeLbl);
+  if(role==="agent"){
+    const readMark = document.createElement("span");
+    readMark.className="read-mark";
+    readMark.innerText="已讀";
+    row.appendChild(readMark);
   }
+  row.appendChild(avatar);
+  row.appendChild(bubbleWrap);
+  chatBox.appendChild(row);
+  chatBox.scrollTop = chatBox.scrollHeight;
 }
-function escapeHtml(str){
-  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+const initMsgs = [
+  {t:"對", r:"client", time:"20:00"},
+  {t:"請問目前從事什麼工作呢?\n平均月收入多少呢?", r:"agent", time:"20:01"},
+  {t:"機械維修", r:"client", time:"20:01"},
+  {t:"月收35000", r:"client", time:"20:01"},
+  {t:"但我沒薪轉", r:"client", time:"20:02"},
+  {t:"請問目前還有什麼貸款再繳呢?", r:"agent", time:"20:02"},
+  {t:"沒有", r:"client", time:"20:02"},
+  {t:"目前名下有哪些銀行有往來呢 (有在使用的帳戶)", r:"agent", time:"20:02"},
+  {t:"國泰", r:"client", time:"20:02"},
+  {t:"這邊給您方案參考", r:"agent", time:"20:02"},
+  {t:"我們可以直接幫你跟銀行貸款一定能過件，但金額會落在50~200萬，我們有配合的銀行以及行員主管，也會幫你做財力證明。\n銀行成功核貸撥款之後我們會收取5%的服務費，比如100萬就是收5萬的服務費 (年利息大概在3.1~3.68)", r:"agent", time:"20:03"}
+];
+initMsgs.forEach(m=>addMessage(m.t, m.r, m.time));
+
+msgInput.addEventListener("keydown", e=>{
+  if(e.key==="Enter" && !e.shiftKey){
+    e.preventDefault();
+    sendMessage();
+  }
+});
+
+function clearAll(){
+  if(!confirm("確定清空全部對話嗎？")) return;
+  chatBox.innerHTML = "";
+}
+function exportData(){
+  alert("可後續再加匯出txt/json功能！");
 }
 </script>
 </body>
