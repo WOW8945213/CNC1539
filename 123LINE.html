@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LINE貸款對話模擬器 v5 可編輯刪除訊息</title>
+<title>LINE貸款對話模擬器 v7 移除已讀標記</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;font-family:"Microsoft JhengHei",sans-serif;}
 body{background:#f5f6f8;height:100vh;display:flex;flex-direction:column;overflow:hidden;}
@@ -34,7 +34,6 @@ body{background:#f5f6f8;height:100vh;display:flex;flex-direction:column;overflow
 .sys-notice{align-self:center;background:#dcdfe3;color:#555;padding:10px 24px;border-radius:16px;text-align:center;font-size:14px;}
 .time-label{font-size:11px;color:#888;margin-top:4px;}
 .msg-row.right .time-label{text-align:right;}
-.read-mark{font-size:11px;color:#777;margin-right:4px;align-self:center;}
 .msg-menu{position:absolute;background:#fff;border:1px solid #ddd;border-radius:8px;box-shadow:0 3px 10px #0002;z-index:99;display:none;min-width:110px;}
 .msg-menu button{width:100%;padding:8px 12px;border:none;background:none;text-align:left;font-size:14px;cursor:pointer;}
 .msg-menu button:hover{background:#f0f2f5;}
@@ -119,7 +118,6 @@ LINE ID：jerry4999
   </div>
 </div>
 
-<!-- 訊息右鍵/點擊選單 -->
 <div class="msg-menu" id="msgMenu">
   <button onclick="editMsg()">✏️ 編輯</button>
   <button onclick="delMsg()">🗑️ 刪除</button>
@@ -130,6 +128,7 @@ let currentRole = "agent";
 let clientName = "Kun (胖8.25)";
 let avatarImgSrc = null;
 let activeMsgRow = null;
+let lastDateLabel = null;
 
 const roleAgentBtn = document.getElementById("roleAgent");
 const roleClientBtn = document.getElementById("roleClient");
@@ -199,16 +198,12 @@ function sendMessage(){
 }
 
 function addMessage(text, role, timeStr, dateLabel){
-  const lastDivider = chatBox.querySelector(".date-divider:last-child");
-  let needDivider = true;
-  if(lastDivider && lastDivider.innerText === dateLabel){
-    needDivider = false;
-  }
-  if(needDivider){
+  if(lastDateLabel !== dateLabel){
     const divider = document.createElement("div");
     divider.className = "date-divider";
     divider.innerText = dateLabel;
     chatBox.appendChild(divider);
+    lastDateLabel = dateLabel;
   }
 
   const row = document.createElement("div");
@@ -229,7 +224,6 @@ function addMessage(text, role, timeStr, dateLabel){
   bubble.className = "bubble";
   bubble.innerText = text;
 
-  // 點擊氣泡彈出選單
   bubble.onclick = function(ev){
     ev.stopPropagation();
     activeMsgRow = row;
@@ -243,19 +237,12 @@ function addMessage(text, role, timeStr, dateLabel){
   timeLbl.innerText = timeStr;
   bubbleWrap.appendChild(bubble);
   bubbleWrap.appendChild(timeLbl);
-  if(role==="agent"){
-    const readMark = document.createElement("span");
-    readMark.className="read-mark";
-    readMark.innerText="已讀";
-    row.appendChild(readMark);
-  }
   row.appendChild(avatar);
   row.appendChild(bubbleWrap);
   chatBox.appendChild(row);
   chatBox.scrollTop = chatBox.scrollHeight;
 }
 
-// 編輯訊息
 function editMsg(){
   if(!activeMsgRow) return;
   const bubble = activeMsgRow.querySelector(".bubble");
@@ -268,7 +255,6 @@ function editMsg(){
   activeMsgRow = null;
 }
 
-// 刪除訊息
 function delMsg(){
   if(!activeMsgRow) return;
   if(!confirm("確定刪除這則訊息？")){
@@ -281,7 +267,6 @@ function delMsg(){
   activeMsgRow = null;
 }
 
-// 點空白處關閉選單
 document.addEventListener("click", function(){
   msgMenu.style.display = "none";
   activeMsgRow = null;
@@ -301,6 +286,7 @@ const divider = document.createElement("div");
 divider.className = "date-divider";
 divider.innerText = initDateLabel;
 chatBox.appendChild(divider);
+lastDateLabel = initDateLabel;
 addSystemNotice("19:56","用户已將您加入好友!");
 addMessage("我是立順投資有限公司\n您好Kun\n感謝您加入好友✨✨✨\n\n請提供您的：姓名\n方便貸款專員協助您辦理流程喔🀄🀄🀄","agent","19:56");
 addMessage("黃巳坤","client","19:56");
@@ -315,6 +301,7 @@ msgInput.addEventListener("keydown", e=>{
 function clearAll(){
   if(!confirm("確定清空全部對話嗎？")) return;
   chatBox.innerHTML = "";
+  lastDateLabel = null;
 }
 </script>
 </body>
