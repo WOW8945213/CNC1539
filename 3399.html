@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>本息平均攤還試算｜錢婆婆小屋</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{
+    background: linear-gradient(180deg,#5c5046 0%,#8c7866 45%,#b8a68f 100%);
+    min-height:100vh;
+    font-family:"Noto Sans TC", "Hiragino Maru Gothic ProN",serif;
+    padding:30px 15px;
+    color:#3b322b;
+    /* 粗麻布紋理背景 */
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23a08e7b' fill-opacity='0.12'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+.zen-card{
+    max-width:620px;
+    margin:0 auto;
+    background-color:#f2e9da;
+    border-radius:16px;
+    box-shadow:0 10px 30px rgba(30,24,18,0.35);
+    padding:36px 30px;
+    border:3px solid #947f6b;
+    position:relative;
+    overflow:hidden;
+}
+/* 編織線條偽裝裝飾 */
+.zen-card::before{
+    content:"";
+    position:absolute;
+    width:180px;height:180px;
+    left:-60px;top:-60px;
+    background:radial-gradient(ellipse,rgba(160,120,80,0.18),transparent 70%);
+    pointer-events:none;
+}
+.zen-card::after{
+    content:"🧵";
+    position:absolute;
+    right:16px;
+    top:16px;
+    font-size:24px;
+    opacity:0.6;
+}
+h1{
+    text-align:center;
+    font-size:26px;
+    color:#59473a;
+    margin-bottom:32px;
+    letter-spacing:1px;
+}
+.form-row{
+    margin-bottom:20px;
+}
+label{
+    display:block;
+    margin-bottom:7px;
+    font-size:16px;
+    font-weight:500;
+}
+input{
+    width:100%;
+    padding:12px 14px;
+    font-size:16px;
+    border:1.8px solid #a89480;
+    border-radius:12px;
+    background:#fffaf0;
+    transition:0.25s;
+}
+input:focus{
+    outline:none;
+    border-color:#805e42;
+    box-shadow:0 0 0 3px rgba(130,90,60,0.22);
+}
+.btn-group{
+    display:flex;
+    gap:12px;
+    margin-top:30px;
+}
+button{
+    flex:1;
+    padding:13px;
+    border:none;
+    border-radius:12px;
+    font-size:16px;
+    font-weight:500;
+    cursor:pointer;
+    transition:0.2s;
+}
+.btn-calc{
+    background-color:#825c40;
+    color:#fff8ee;
+}
+.btn-calc:hover{background-color:#6b4a33;}
+.btn-clear{
+    background-color:#b8a894;
+    color:#3b322b;
+}
+.btn-clear:hover{background-color:#a08e7b;}
+.btn-print{
+    background-color:#907c68;
+    color:#fff8ee;
+}
+.btn-print:hover{background-color:#786553;}
+.result-area{
+    margin-top:28px;
+    padding:20px;
+    background:#fff5e6;
+    border-radius:14px;
+    border:1px dashed #b09c86;
+}
+@media(max-width:480px){
+    .zen-card{padding:24px 18px;}
+    h1{font-size:22px;}
+    .btn-group{flex-direction:column;}
+}
+</style>
+</head>
+<body>
+<div class="zen-card">
+    <h1>🧶 本息平均攤還試算</h1>
+    <div class="form-row">
+        <label>您的貸款金額（萬）</label>
+        <input id="loanAmt" type="number" placeholder="輸入貸款金額">
+    </div>
+    <div class="form-row">
+        <label>貸款年數（年）</label>
+        <input id="loanYear" type="number" placeholder="貸款幾年">
+    </div>
+    <div class="form-row">
+        <label>貸款起始(民國)年月</label>
+        <div style="display:flex;gap:10px;">
+            <input id="rocYear" type="number" placeholder="民國年">
+            <input id="rocMonth" type="number" placeholder="月份">
+        </div>
+    </div>
+    <div class="form-row">
+        <label>年利率（%）</label>
+        <input id="rate" type="number" step="0.01" placeholder="例如 2.15">
+    </div>
+    <div class="btn-group">
+        <button class="btn-calc" onclick="doCalc()">📝 試算</button>
+        <button class="btn-clear" onclick="doClear()">🗑️ 清除</button>
+        <button class="btn-print" onclick="window.print()">🖨️ 列印</button>
+    </div>
+    <div class="result-area" id="resultBox">
+        <div>試算結果會顯示在此處</div>
+    </div>
+</div>
+<script>
+function doCalc(){
+    const loanAmtWan = Number(document.getElementById('loanAmt').value);
+    const loanYear = Number(document.getElementById('loanYear').value);
+    const rocY = document.getElementById('rocYear').value;
+    const rocM = document.getElementById('rocMonth').value;
+    const annualRate = Number(document.getElementById('rate').value);
+    if(!loanAmtWan||!loanYear||!annualRate){
+        document.getElementById("resultBox").innerHTML = `<div style="color:#883322;">⚠️請填寫貸款金額、年數、年利率</div>`;
+        return;
+    }
+    const principal = loanAmtWan * 10000;
+    const monthRate = annualRate /100 /12;
+    const totalMonth = loanYear * 12;
+    let monthPay;
+    if(monthRate===0){
+        monthPay = principal / totalMonth;
+    }else{
+        monthPay = principal * monthRate * Math.pow(1+monthRate,totalMonth) / ( Math.pow(1+monthRate,totalMonth)-1 );
+    }
+    const totalPay = monthPay * totalMonth;
+    const totalInterest = totalPay - principal;
+    let html = `
+        <div>貸款金額：${loanAmtWan} 萬元</div>
+        <div>貸款期間：${loanYear} 年 (共${totalMonth}期)</div>
+        <div>年利率：${annualRate} %</div>
+        ${rocY&&rocM?`<div>貸款起算：民國 ${rocY} 年 ${rocM} 月</div>`:""}
+        <hr style="margin:12px 0;border-color:#d4c4b2;">
+        <div><strong>每月還款：${monthPay.toLocaleString('zh-TW',{maximumFractionDigits:2})} 元</strong></div>
+        <div>總還款金額：${totalPay.toLocaleString('zh-TW',{maximumFractionDigits:2})} 元</div>
+        <div>總繳利息：${totalInterest.toLocaleString('zh-TW',{maximumFractionDigits:2})} 元</div>
+    `;
+    document.getElementById("resultBox").innerHTML = html;
+}
+function doClear(){
+    document.getElementById('loanAmt').value='';
+    document.getElementById('loanYear').value='';
+    document.getElementById('rocYear').value='';
+    document.getElementById('rocMonth').value='';
+    document.getElementById('rate').value='';
+    document.getElementById("resultBox").innerHTML = `<div>試算結果會顯示在此處</div>`;
+}
+</script>
+</body>
+</html>
