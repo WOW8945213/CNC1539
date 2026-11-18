@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<title>本息平均攤還試算</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%235798c2'/%3E%3Ctext x='32' y='44' font-size='30' fill='white' text-anchor='middle'%3E貸%3C/text%3E%3C/svg%3E">
+<style>
+:root{
+  --ink:#344f68; --deep:#376b91; --blue:#78add0; --pale:#eaf5fc;
+  --paper:#fbfdff; --line:#c8ddeb; --sky:#d9efff;
+  --gold:#d6ad68; --coral:#c17b69; --shadow:0 12px 30px rgba(57,103,137,.13);
+}
+*{box-sizing:border-box;font-family:"Microsoft JhengHei","Noto Sans TC",sans-serif}
+body{
+  padding:24px 12px;margin:0;color:var(--ink);
+  background:
+    radial-gradient(ellipse at 12% 8%,rgba(255,255,255,.95) 0 7%,transparent 28%),
+    radial-gradient(ellipse at 88% 20%,rgba(255,255,255,.78) 0 6%,transparent 25%),
+    linear-gradient(160deg,#cce9fb 0%,#e5f3fc 52%,#f4f8fb 100%);
+}
+.wrap{
+  max-width:820px;margin:0 auto;overflow:hidden;border:1px solid #b8d6e9;
+  border-radius:24px;background:rgba(251,253,255,.97);box-shadow:var(--shadow);
+}
+.title-bar{
+  position:relative;overflow:hidden;padding:24px 18px 20px;text-align:center;
+  color:#fff;font-size:23px;font-weight:800;letter-spacing:2px;
+  background:linear-gradient(120deg,#4c8db8,#72b2d8 58%,#a4d4ec);
+  text-shadow:0 2px 4px rgba(38,81,111,.2);
+}
+.title-bar:before,.title-bar:after{
+  content:"☁";position:absolute;color:rgba(255,255,255,.48);font-size:38px;
+}
+.title-bar:before{left:22px;top:8px}.title-bar:after{right:22px;bottom:2px}
+.vt-toggle-row{
+  display:flex;gap:8px;padding:8px;background:#edf6fc;border-bottom:1px solid var(--line);
+  align-items:center;
+}
+.vt-btn{
+  flex:1;padding:10px;border:1px solid transparent;border-radius:13px;background:transparent;
+  font-size:14px;cursor:pointer;color:var(--deep);font-weight:700;
+}
+.vt-btn.active{background:#5798c2;color:white;box-shadow:0 3px 8px rgba(55,107,145,.2)}
+.select-wrap{padding:10px;background:#edf6fc;border-bottom:1px solid var(--line);}
+#layoutSelect{
+  width:100%;padding:9px 12px;border-radius:11px;border:1px solid #bcd6e7;
+  font-size:15px;color:var(--ink);
+}
+.input-area{padding:22px;background:linear-gradient(145deg,#eff8fe,#e0f0fa)}
+.input-row{display:flex;align-items:center;margin:11px 0;gap:10px}
+.input-row label{width:190px;padding:3px;font-size:15px;font-weight:700;color:#426783}
+.input-row input{
+  width:220px;min-width:0;padding:10px 12px;font-size:15px;color:var(--ink);
+  background:#fff;border:1px solid #bcd6e7;border-radius:11px;outline:none;
+}
+.input-row input:focus{border-color:#65a6ce;box-shadow:0 0 0 3px rgba(101,166,206,.17)}
+.input-row .unit{padding:0 3px;font-size:14px;color:#557b96}
+.inline-group{display:flex;gap:6px;align-items:center}.inline-group input{width:94px}
+.btn-group{text-align:center;margin:20px 0 2px}
+button{
+  padding:9px 17px;font-size:14px;margin:3px;cursor:pointer;font-family:inherit;
+  color:#fff;background:#5798c2;border:0;border-radius:999px;
+  box-shadow:0 3px 0 #39799f;transition:transform .15s,filter .15s;
+}
+button:hover{filter:brightness(1.06);transform:translateY(-1px)}
+button:active{transform:translateY(2px);box-shadow:0 1px 0 #39799f}
+.result-block{padding:18px;display:none;}
+h3{font-size:19px;margin:8px 0 14px;text-align:center;color:#39799f}
+h4{font-size:15px;margin:12px 0 7px;color:#426f8e}
+.param-strip{display:none}
+table{width:100%;border-collapse:separate;border-spacing:0;margin-top:10px;overflow:hidden;border-radius:12px}
+th{background:#5798c2;color:#fff;padding:10px 5px;text-align:center;font-size:14px}
+td{border-bottom:1px solid #dceaf3;padding:8px 5px;text-align:center;font-size:13px}
+tr.odd-year{background:#ffffff}
+tr.even-year{background:#e8f4fc}
+tr.odd-year td,tr.even-year td{background:transparent}
+tr.year-start td{border-top:2px solid #b4d3e7}
+.omit-row td{
+  text-align:center;color:#55748b;background:#f3f8fc;font-size:13px;
+  border-top:1px dashed #b7d2e3;border-bottom:1px dashed #b7d2e3
+}
+.result-summary{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;margin:12px 0;gap:9px}
+.sum-card{
+  border:1px solid #cbdfea;border-radius:15px;padding:12px 5px;text-align:center;
+  background:linear-gradient(150deg,#fff,#eff7fc);box-shadow:0 3px 9px rgba(57,103,137,.07)
+}
+.sum-card div:first-child{font-size:13px;color:#527a96;font-weight:700}
+.big-red{font-size:22px;color:#c17b69;font-weight:800;margin-top:7px;white-space:nowrap}
+.action-row{display:none}
+.tip-wrap{margin-top:14px;padding:14px;border-radius:15px;background:#eef6fb;border:1px dashed #b5d3e5}
+.tip-text{font-size:14px;color:#405f76;margin-bottom:10px;line-height:1.7}
+.copy-btn,.snap-btn,.full-btn{padding:8px 13px;font-size:13px}
+.full-btn{background:#6e9fbd;box-shadow:0 3px 0 #4e7e9c}
+.copy-btn{background:#5e9ebf;box-shadow:0 3px 0 #39799f}
+.snap-btn{background:#829eae;box-shadow:0 3px 0 #627d8d}
+
+/* 版型2 橫幅摘要 */
+.summary-banner{
+  background:linear-gradient(135deg,#5798c2,#78add0);
+  color:#fff;
+  padding:14px 18px;
+  border-radius:14px;
+  margin-bottom:14px;
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
+  text-align:center;
+}
+.summary-banner .item small{opacity:0.85;font-size:13px;display:block;}
+.summary-banner .item .num{font-size:20px;font-weight:bold;margin-top:4px;}
+
+/* 版型3 時間軸 */
+.timeline-wrap{
+  margin-bottom:16px;
+  border-left:3px solid #78add0;
+  padding-left:16px;
+}
+.timeline-item{margin:10px 0;}
+.timeline-item label{font-size:14px;color:#344f68;}
+.timeline-item .val{font-size:21px;font-weight:bold;color:#c17b69;}
+
+/* 版型4 左右分欄 */
+.split-row{display:grid;grid-template-columns:280px 1fr;gap:16px;align-items:start;margin-bottom:12px;}
+.split-left{background:#eef6fb;padding:16px;border-radius:14px;}
+.split-left .sum-card{margin-bottom:10px;}
+
+/* 版型5 Tab切換 */
+.tab-bar{display:flex;gap:6px;margin-bottom:12px;}
+.tab-btn{padding:8px 14px;border-radius:10px;background:#e8f4fc;color:#344f68;border:none;cursor:pointer;}
+.tab-btn.active{background:#5798c2;color:#fff;}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+
+@media(max-width:680px){
+  .summary-banner{grid-template-columns:1fr 1fr;gap:10px;}
+  .split-row{grid-template-columns:1fr;}
+}
+@media(max-width:560px){
+  body{padding:0}.wrap{border-radius:0}
+  .input-row label{width:145px;font-size:13px}
+  .input-row input{width:180px}.inline-group input{width:75px}
+  .result-summary{grid-template-columns:1fr 1fr}
+  th{font-size:11px;padding:7px 2px}td{font-size:11px;padding:6px 2px}
+}
+@media print{
+  .vt-toggle-row,.select-wrap,.input-area,.btn-group,.tip-wrap,button:not(.keep-print){display:none!important}
+  .wrap{border:none;box-shadow:none}
+  .result-block{display:block!important}
+}
+</style>
+</head>
+<body data-mode="web">
+<div class="wrap">
+  <div class="title-bar">☁️　🌿 本息平均攤還試算 🌿　☁️</div>
+  <div class="vt-toggle-row">
+    <button class="vt-btn active" data-mode="web">💻 網頁版</button>
+    <button class="vt-btn" data-mode="mobile">📱 手機版</button>
+  </div>
+  <div class="select-wrap">
+    <select id="layoutSelect">
+      <option value="1">版型1｜四卡片原版</option>
+      <option value="2">版型2｜橫幅摘要</option>
+      <option value="3">版型3｜時間軸摘要</option>
+      <option value="4">版型4｜左右分欄</option>
+      <option value="5">版型5｜Tab標籤總覽/利息拆解</option>
+    </select>
+  </div>
+  <div class="input-area">
+    <div class="input-row">
+      <label>💰 您的貸款金額：</label>
+      <input type="number" id="principal" value="">
+      <span class="unit">萬</span>
+    </div>
+    <div class="input-row">
+      <label>🌳 貸款年數：</label>
+      <input type="number" id="loanYear" value="">
+      <span class="unit">年</span>
+    </div>
+    <div class="input-row">
+      <label>🗓️ 貸款起始(民國年月)：</label>
+      <div class="inline-group">
+        <input type="number" id="rocYear" value="">
+        <span class="unit">年</span>
+        <input type="number" id="rocMonth" value="">
+        <span class="unit">月</span>
+      </div>
+    </div>
+    <div class="input-row">
+      <label>🍃 年利率：</label>
+      <input type="number" step="0.0001" id="rate" value="">
+      <span class="unit">%</span>
+    </div>
+    <div class="btn-group">
+      <button onclick="calc()">✨ 開始試算</button>
+      <button onclick="clearAll()">🧹 清除</button>
+      <button onclick="printResult()">🖨️ 列印</button>
+    </div>
+  </div>
+
+  <!-- 5種版型容器 -->
+  <div class="result-block" id="resultBlock">
+    <div class="layout layout-1">
+      <h3>🌼 單筆試算結果</h3>
+      <div class="param-strip" id="paramStrip1"></div>
+      <h4 id="detailTitle1">📖 還款明細表（僅顯示前8期與後8期，中間期數省略）</h4>
+      <div style="text-align:center;margin:6px 0;">
+        <button class="full-btn keep-print" onclick="toggleFullList()">顯示全部期數</button>
+      </div>
+      <table>
+        <thead>
+          <tr><th>期數</th><th>繳款日期</th><th>每月應繳</th><th>本金</th><th>利息</th><th>剩餘本金</th></tr>
+        </thead>
+        <tbody id="scheduleBody1"></tbody>
+      </table>
+      <div class="result-summary">
+        <div class="sum-card"><div>🌙 每月應繳金額</div><div class="big-red" id="monthPay1"></div></div>
+        <div class="sum-card"><div>💰 貸款本金</div><div class="big-red" id="pri1"></div></div>
+        <div class="sum-card"><div>🍂 總利息金額</div><div class="big-red" id="totalInt1"></div></div>
+        <div class="sum-card"><div>🏡 總繳款金額</div><div class="big-red" id="totalPay1"></div></div>
+      </div>
+      <div class="action-row">
+        <button onclick="backToInput()">↩️ 返回修改</button>
+        <button onclick="printResult()">🖨️ 列印</button>
+      </div>
+      <div class="tip-wrap">
+        <div class="tip-text" id="tipText1"></div>
+        <button class="copy-btn keep-print" onclick="copyTip()">📋 一鍵複製這段文字</button>
+        <button class="snap-btn keep-print" onclick="openWinSnipping()">📸 系統截圖(Win+Shift+S)</button>
+      </div>
+    </div>
+
+    <div class="layout layout-2">
+      <h3>🌼 單筆試算結果</h3>
+      <div class="param-strip" id="paramStrip2"></div>
+      <div class="summary-banner">
+        <div class="item"><small>每月應繳</small><div class="num" id="monthPay2"></div></div>
+        <div class="item"><small>貸款本金</small><div class="num" id="pri2"></div></div>
+        <div class="item"><small>總利息</small><div class="num" id="totalInt2"></div></div>
+        <div class="item"><small>總繳款</small><div class="num" id="totalPay2"></div></div>
+      </div>
+      <h4 id="detailTitle2">📖 還款明細表（僅顯示前8期與後8期，中間期數省略）</h4>
+      <div style="text-align:center;margin:6px 0;">
+        <button class="full-btn keep-print" onclick="toggleFullList()">顯示全部期數</button>
+      </div>
+      <table>
+        <thead>
+          <tr><th>期數</th><th>繳款日期</th><th>每月應繳</th><th>本金</th><th>利息</th><th>剩餘本金</th></tr>
+        </thead>
+        <tbody id="scheduleBody2"></tbody>
+      </table>
+      <div class="tip-wrap">
+        <div class="tip-text" id="tipText2"></div>
+        <button class="copy-btn keep-print" onclick="copyTip()">📋 一鍵複製這段文字</button>
+        <button class="snap-btn keep-print" onclick="openWinSnipping()">📸 系統截圖(Win+Shift+S)</button>
+      </div>
+    </div>
+
+    <div class="layout layout-3">
+      <h3>🌼 單筆試算結果</h3>
+      <div class="param-strip" id="paramStrip3"></div>
+      <div class="timeline-wrap">
+        <div class="timeline-item"><label>每月應繳金額</label><div class="val" id="monthPay3"></div></div>
+        <div class="timeline-item"><label>貸款本金</label><div class="val" id="pri3"></div></div>
+        <div class="timeline-item"><label>總利息金額</label><div class="val" id="totalInt3"></div></div>
+        <div class="timeline-item"><label>總繳款金額</label><div class="val" id="totalPay3"></div></div>
+      </div>
+      <h4 id="detailTitle3">📖 還款明細表（僅顯示前8期與後8期，中間期數省略）</h4>
+      <div style="text-align:center;margin:6px 0;">
+        <button class="full-btn keep-print" onclick="toggleFullList()">顯示全部期數</button>
+      </div>
+      <table>
+        <thead>
+          <tr><th>期數</th><th>繳款日期</th><th>每月應繳</th><th>本金</th><th>利息</th><th>剩餘本金</th></tr>
+        </thead>
+        <tbody id="scheduleBody3"></tbody>
+      </table>
+      <div class="tip-wrap">
+        <div class="tip-text" id="tipText3"></div>
+        <button class="copy-btn keep-print" onclick="copyTip()">📋 一鍵複製這段文字</button>
+        <button class="snap-btn keep-print" onclick="openWinSnipping()">📸 系統截圖(Win+Shift+S)</button>
+      </div>
+    </div>
+
+    <div class="layout layout-4">
+      <h3>🌼 單筆試算結果</h3>
+      <div class="param-strip" id="paramStrip4"></div>
+      <div class="split-row">
+        <div class="split-left">
+          <div class="sum-card"><div>🌙 每月應繳金額</div><div class="big-red" id="monthPay4"></div></div>
+          <div class="sum-card"><div>💰 貸款本金</div><div class="big-red" id="pri4"></div></div>
+          <div class="sum-card"><div>🍂 總利息金額</div><div class="big-red" id="totalInt4"></div></div>
+          <div class="sum-card"><div>🏡 總繳款金額</div><div class="big-red" id="totalPay4"></div></div>
+        </div>
+        <div class="split-right">
+          <h4 id="detailTitle4">📖 還款明細表（僅顯示前8期與後8期，中間期數省略）</h4>
+          <div style="text-align:center;margin:6px 0;">
+            <button class="full-btn keep-print" onclick="toggleFullList()">顯示全部期數</button>
+          </div>
+          <table>
+            <thead>
+              <tr><th>期數</th><th>繳款日期</th><th>每月應繳</th><th>本金</th><th>利息</th><th>剩餘本金</th></tr>
+            </thead>
+            <tbody id="scheduleBody4"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="tip-wrap">
+        <div class="tip-text" id="tipText4"></div>
+        <button class="copy-btn keep-print" onclick="copyTip()">📋 一鍵複製這段文字</button>
+        <button class="snap-btn keep-print" onclick="openWinSnipping()">📸 系統截圖(Win+Shift+S)</button>
+      </div>
+    </div>
+
+    <div class="layout layout-5">
+      <h3>🌼 單筆試算結果</h3>
+      <div class="param-strip" id="paramStrip5"></div>
+      <div class="tab-bar">
+        <button class="tab-btn active" data-tab="tab1">📊 總覽</button>
+        <button class="tab-btn" data-tab="tab2">💸 利息拆解</button>
+      </div>
+      <div class="tab-panel active" id="tab1">
+        <div class="result-summary">
+          <div class="sum-card"><div>🌙 每月應繳金額</div><div class="big-red" id="monthPay5"></div></div>
+          <div class="sum-card"><div>💰 貸款本金</div><div class="big-red" id="pri5"></div></div>
+          <div class="sum-card"><div>🍂 總利息金額</div><div class="big-red" id="totalInt5"></div></div>
+          <div class="sum-card"><div>🏡 總繳款金額</div><div class="big-red" id="totalPay5"></div></div>
+        </div>
+      </div>
+      <div class="tab-panel" id="tab2">
+        <div class="sum-card" style="max-width:400px;margin:0 auto;">
+          <div>利息占比</div>
+          <div class="big-red" id="rateText5"></div>
+          <div style="margin-top:8px;font-size:13px;color:#527a96;">利息占總繳款比例</div>
+        </div>
+      </div>
+      <h4 id="detailTitle5">📖 還款明細表（僅顯示前8期與後8期，中間期數省略）</h4>
+      <div style="text-align:center;margin:6px 0;">
+        <button class="full-btn keep-print" onclick="toggleFullList()">顯示全部期數</button>
+      </div>
+      <table>
+        <thead>
+          <tr><th>期數</th><th>繳款日期</th><th>每月應繳</th><th>本金</th><th>利息</th><th>剩餘本金</th></tr>
+        </thead>
+        <tbody id="scheduleBody5"></tbody>
+      </table>
+      <div class="tip-wrap">
+        <div class="tip-text" id="tipText5"></div>
+        <button class="copy-btn keep-print" onclick="copyTip()">📋 一鍵複製這段文字</button>
+        <button class="snap-btn keep-print" onclick="openWinSnipping()">📸 系統截圖(Win+Shift+S)</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let lastResult = null;
+let showAll = false;
+let currentLayout = "1";
+
+// 版型切換
+const layoutSel = document.getElementById("layoutSelect");
+layoutSel.onchange = ()=>{
+  currentLayout = layoutSel.value;
+  renderLayout();
+};
+function renderLayout(){
+  document.querySelectorAll(".layout").forEach(el=>el.style.display="none");
+  document.querySelector(".layout-"+currentLayout).style.display="block";
+}
+renderLayout();
+
+// 網頁/手機模式切換
+document.querySelectorAll(".vt-btn").forEach(btn=>{
+  btn.onclick = ()=>{
+    document.querySelectorAll(".vt-btn").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    document.body.dataset.mode = btn.dataset.mode;
+  }
+})
+
+// Tab切換（版型5）
+document.querySelectorAll(".tab-btn").forEach(btn=>{
+  btn.onclick = ()=>{
+    const t = btn.dataset.tab;
+    document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
+    document.querySelectorAll(".tab-panel").forEach(p=>p.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById(t).classList.add("active");
+  }
+})
+
+// 計算
+function calc(){
+  const principal = Number(document.getElementById("principal").value) * 10000;
+  const loanYear = Number(document.getElementById("loanYear").value);
+  const rocY = Number(document.getElementById("rocYear").value);
+  const rocM = Number(document.getElementById("rocMonth").value);
+  const rate = Number(document.getElementById("rate").value)/100;
+  if(!principal||!loanYear||!rocY||!rocM||!rate){
+    alert("請填寫完整資料");
+    return;
+  }
+  const monthRate = rate / 12;
+  const totalMonth = loanYear * 12;
+  const monthPay = principal * monthRate * Math.pow(1+monthRate,totalMonth) / (Math.pow(1+monthRate,totalMonth)-1);
+  let list = [];
+  let rest = principal;
+  let totalInterest = 0;
+  for(let i=1;i<=totalMonth;i++){
+    let interest = rest * monthRate;
+    let capital = monthPay - interest;
+    if(rest < capital){
+      capital = rest;
+      rest = 0;
+    }else{
+      rest = rest - capital;
+    }
+    totalInterest += interest;
+    let m = rocM + i - 1;
+    let y = rocY + Math.floor((m-1)/12);
+    let mm = ((m-1)%12)+1;
+    list.push({
+      no:i,
+      date:y+"/"+String(mm).padStart(2,"0"),
+      pay:monthPay,
+      cap:capital,
+      int:interest,
+      rest:rest
+    })
+  }
+  lastResult = {
+    principal,loanYear,rocY,rocM,rate,
+    monthPay,totalInterest,totalPay:principal+totalInterest,list
+  }
+  showAll = false;
+  renderResult();
+  document.getElementById("resultBlock").style.display="block";
+}
+function renderResult(){
+  const d = lastResult;
+  const tipStr = `幫您試算的是貸款金額${(d.principal/10000).toLocaleString()}萬，分期${d.loanYear}年，年利率${(d.rate*100).toFixed(4)}%，每月應繳${Math.round(d.monthPay).toLocaleString()}元，總利息${Math.round(d.totalInterest).toLocaleString()}元，總繳款${Math.round(d.totalPay).toLocaleString()}元`;
+  const ratePercent = (d.totalInterest/d.totalPay*100).toFixed(2)+" %";
+  const showList = showAll ? d.list : [...d.list.slice(0,8),{omit:true},...d.list.slice(-8)];
+  for(let i=1;i<=5;i++){
+    document.getElementById("monthPay"+i).innerText = Math.round(d.monthPay).toLocaleString()+" 元";
+    document.getElementById("pri"+i).innerText = (d.principal/10000).toLocaleString()+" 萬";
+    document.getElementById("totalInt"+i).innerText = Math.round(d.totalInterest).toLocaleString()+" 元";
+    document.getElementById("totalPay"+i).innerText = Math.round(d.totalPay).toLocaleString()+" 元";
+    document.getElementById("tipText"+i).innerText = tipStr;
+    if(i===5) document.getElementById("rateText5").innerText = ratePercent;
+    const tbody = document.getElementById("scheduleBody"+i);
+    tbody.innerHTML = "";
+    showList.forEach(row=>{
+      if(row.omit){
+        tbody.innerHTML += `<tr class="omit-row"><td colspan="6">……中間省略……</td></tr>`
+      }else{
+        const yearSeq = Math.ceil(row.no/12);
+        const isYearStart = (row.no>1 && (row.no-1)%12===0);
+        tbody.innerHTML += `<tr class="${yearSeq%2===1?'odd-year':'even-year'} ${isYearStart?'year-start':''}">
+          <td>${row.no}</td>
+          <td>${row.date}</td>
+          <td>${Math.round(row.pay).toLocaleString()}</td>
+          <td>${Math.round(row.cap).toLocaleString()}</td>
+          <td>${Math.round(row.int).toLocaleString()}</td>
+          <td>${Math.round(row.rest).toLocaleString()}</td>
+        </tr>`
+      }
+    })
+  }
+}
+function toggleFullList(){
+  showAll = !showAll;
+  renderResult();
+}
+function backToInput(){
+  document.getElementById("resultBlock").style.display="none";
+}
+function clearAll(){
+  document.getElementById("principal").value="";
+  document.getElementById("loanYear").value="";
+  document.getElementById("rocYear").value="";
+  document.getElementById("rocMonth").value="";
+  document.getElementById("rate").value="";
+  document.getElementById("resultBlock").style.display="none";
+  lastResult=null;
+}
+function copyTip(){
+  navigator.clipboard.writeText(lastResult?document.getElementById("tipText"+currentLayout).innerText:"");
+}
+function openWinSnipping(){
+  window.open("ms-screenclip:");
+}
+function printResult(){
+  if(document.getElementById('resultBlock').style.display === "none"){
+    return;
+  }
+  window.print();
+}
+</script>
+</body>
+</html>
