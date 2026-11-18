@@ -6,12 +6,11 @@
 <title>本息平均攤還試算</title>
 <style>
 :root{
-  --ink:#344f68;
-  --deep:#376b91;
-  --blue:#78add0;
-  --line:#c8ddeb;
-  --paper:#fbfdff;
-  --shadow:0 12px 30px rgba(57,103,137,.13);
+  --ink:#222222;
+  --blue:#5499d6;
+  --blue-soft:#eaf4fc;
+  --line:#d7e8f7;
+  --shadow:0 6px 18px rgba(84,153,214,.12);
 }
 
 *{
@@ -20,30 +19,27 @@
 }
 
 body{
-  padding:24px 12px;
+  padding:18px 10px;
   margin:0;
   color:var(--ink);
-  background:
-    radial-gradient(ellipse at 12% 8%,rgba(255,255,255,.95) 0 7%,transparent 28%),
-    radial-gradient(ellipse at 88% 20%,rgba(255,255,255,.78) 0 6%,transparent 25%),
-    linear-gradient(160deg,#cce9fb 0%,#e5f3fc 52%,#f4f8fb 100%);
+  background:#f7fbff;
 }
 
 .wrap{
   max-width:820px;
   margin:0 auto;
-  overflow:hidden;
-  border:1px solid #b8d6e9;
-  border-radius:24px;
-  background:rgba(251,253,255,.97);
+  background:#fff;
+  border-radius:22px;
+  border:1px solid #e3f1fc;
   box-shadow:var(--shadow);
+  overflow:hidden;
 }
 
 .title-bar{
-  padding:22px 18px;
+  padding:20px 16px;
   text-align:center;
   color:#fff;
-  font-size:22px;
+  font-size:21px;
   font-weight:800;
   letter-spacing:2px;
   background:linear-gradient(120deg,#4c8db8,#72b2d8 58%,#a4d4ec);
@@ -53,7 +49,7 @@ body{
   display:flex;
   gap:8px;
   padding:8px;
-  background:#edf6fc;
+  background:#f7fbff;
   border-bottom:1px solid var(--line);
   align-items:center;
 }
@@ -66,34 +62,33 @@ body{
   background:transparent;
   font-size:14px;
   cursor:pointer;
-  color:var(--deep);
+  color:#426f8e;
   font-weight:700;
 }
 
 .vt-btn.active{
   background:#5798c2;
-  color:white;
-  box-shadow:0 3px 8px rgba(55,107,145,.2)
+  color:#fff;
 }
 
 .input-area{
-  padding:22px;
-  background:linear-gradient(145deg,#eff8fe,#e0f0fa);
+  padding:20px;
+  background:#f7fbff;
 }
 
 .input-row{
   display:flex;
   align-items:center;
-  margin:11px 0;
-  gap:10px
+  margin:10px 0;
+  gap:10px;
 }
 
 .input-row label{
-  width:190px;
+  width:180px;
   padding:3px;
   font-size:15px;
   font-weight:700;
-  color:#426783
+  color:#426783;
 }
 
 .input-row input{
@@ -110,13 +105,13 @@ body{
 
 .input-row input:focus{
   border-color:#65a6ce;
-  box-shadow:0 0 0 3px rgba(101,166,206,.17)
+  box-shadow:0 0 0 3px rgba(101,166,206,.17);
 }
 
 .input-row .unit{
   padding:0 3px;
   font-size:14px;
-  color:#557b96
+  color:#557b96;
 }
 
 .inline-group{
@@ -131,7 +126,7 @@ body{
 
 .btn-group{
   text-align:center;
-  margin:20px 0 2px
+  margin:18px 0 2px;
 }
 
 button{
@@ -150,12 +145,12 @@ button{
 
 button:hover{
   filter:brightness(1.06);
-  transform:translateY(-1px)
+  transform:translateY(-1px);
 }
 
 button:active{
   transform:translateY(2px);
-  box-shadow:0 1px 0 #39799f
+  box-shadow:0 1px 0 #39799f;
 }
 
 button.primary{
@@ -172,23 +167,93 @@ button.primary:hover{
   padding:18px;
 }
 
+/* 上方參數列 + 按鈕 */
+.result-topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  background:var(--blue-soft);
+  border:1px solid #d7e8f7;
+  border-radius:13px;
+  padding:12px 14px;
+  margin-bottom:16px;
+}
+
 .param-strip{
   display:flex;
   flex-wrap:wrap;
-  gap:4px 13px;
-  background:#edf6fc;
-  border:1px solid #cbdfea;
-  border-radius:10px;
-  padding:10px 12px;
+  gap:4px 12px;
   font-size:13px;
   line-height:1.6;
-  margin-bottom:14px;
+  color:#444;
 }
 
 .param-strip b{
-  color:#39799f;
+  color:#222;
 }
 
+.btn-toggle-full{
+  flex-shrink:0;
+  padding:8px 14px;
+  font-size:13px;
+  border:none;
+  border-radius:999px;
+  background:#5499d6;
+  color:#fff;
+  cursor:pointer;
+  box-shadow:0 3px 0 #3b7ab0;
+}
+
+.btn-toggle-full:hover{
+  background:#4687bf;
+}
+
+/* 四張摘要卡片 */
+.result-summary{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:12px;
+  margin-bottom:18px;
+}
+
+.sum-card{
+  position:relative;
+  border:1px solid #e3f1fc;
+  border-radius:15px;
+  padding:14px 12px 14px 18px;
+  background:#fff;
+  box-shadow:0 4px 14px rgba(84,153,214,.08);
+  text-align:left;
+  overflow:hidden;
+}
+
+.sum-card::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:14px;
+  bottom:14px;
+  width:5px;
+  background:#5499d6;
+  border-radius:0 4px 4px 0;
+}
+
+.sum-label{
+  font-size:14px;
+  color:#555;
+  font-weight:700;
+  margin-bottom:10px;
+}
+
+.sum-value{
+  font-size:24px;
+  font-weight:800;
+  color:#222;
+  white-space:nowrap;
+}
+
+/* Tab 切換 */
 .tab-bar{
   display:flex;
   gap:6px;
@@ -218,36 +283,7 @@ button.primary:hover{
   display:block;
 }
 
-.result-summary{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:10px;
-  margin-bottom:18px;
-}
-
-.sum-card{
-  border:1px solid #cbdfea;
-  border-radius:15px;
-  padding:14px 8px;
-  text-align:center;
-  background:linear-gradient(150deg,#fff,#eff7fc);
-  box-shadow:0 3px 9px rgba(57,103,137,.08);
-}
-
-.sum-label{
-  font-size:14px;
-  color:#527a96;
-  font-weight:700;
-  margin-bottom:8px;
-}
-
-.sum-value{
-  font-size:24px;
-  font-weight:800;
-  color:#c17b69;
-  white-space:nowrap;
-}
-
+/* 利息拆解 */
 .interest-analysis{
   display:flex;
   justify-content:center;
@@ -255,18 +291,18 @@ button.primary:hover{
 }
 
 .analysis-card{
-  border:1px solid #cbdfea;
+  border:1px solid #e3f1fc;
   border-radius:15px;
   padding:16px 24px;
   text-align:center;
-  background:linear-gradient(150deg,#fff,#eff7fc);
-  box-shadow:0 3px 9px rgba(57,103,137,.08);
+  background:#fff;
+  box-shadow:0 4px 14px rgba(84,153,214,.08);
   min-width:240px;
 }
 
 .analysis-label{
   font-size:14px;
-  color:#527a96;
+  color:#555;
   font-weight:700;
   margin-bottom:8px;
 }
@@ -274,9 +310,10 @@ button.primary:hover{
 .analysis-value{
   font-size:26px;
   font-weight:800;
-  color:#c17b69;
+  color:#222;
 }
 
+/* 明細表 */
 .detail-header{
   display:flex;
   justify-content:space-between;
@@ -312,6 +349,7 @@ td{
   padding:8px 5px;
   text-align:center;
   font-size:13px;
+  color:#333;
 }
 
 tr.odd-year{
@@ -319,7 +357,7 @@ tr.odd-year{
 }
 
 tr.even-year{
-  background:#e8f4fc;
+  background:#f7fbff;
 }
 
 tr.odd-year td,
@@ -376,9 +414,15 @@ tr.year-start td{
   box-shadow:0 3px 0 #627d8d;
 }
 
+/* 手機版：四卡片改為兩兩並排 */
 @media(max-width:720px){
   .result-summary{
     grid-template-columns:1fr 1fr;
+  }
+
+  .result-topbar{
+    flex-direction:column;
+    align-items:flex-start;
   }
 
   .sum-value{
@@ -446,7 +490,7 @@ tr.year-start td{
     display:block !important;
   }
 
-  .param-strip,
+  .result-topbar,
   .tab-bar,
   .tab-panel,
   .detail-header,
@@ -500,13 +544,19 @@ tr.year-start td{
 
   <div class="result-block" id="resultBlock" style="display:none;">
 
-    <div class="param-strip" id="paramStrip"></div>
+    <!-- 上方參數列 + 右側按鈕 -->
+    <div class="result-topbar">
+      <div class="param-strip" id="paramStrip"></div>
+      <button class="btn-toggle-full keep-print" id="toggleFullBtn" onclick="toggleFullList()">顯示全部期數</button>
+    </div>
 
+    <!-- Tab 切換 -->
     <div class="tab-bar">
       <button class="tab-btn active" data-tab="tab1">總覽</button>
       <button class="tab-btn" data-tab="tab2">利息拆解</button>
     </div>
 
+    <!-- 總覽：四張卡片 -->
     <div class="tab-panel active" id="tab1">
       <div class="result-summary">
         <div class="sum-card">
@@ -528,6 +578,7 @@ tr.year-start td{
       </div>
     </div>
 
+    <!-- 利息拆解 -->
     <div class="tab-panel" id="tab2">
       <div class="interest-analysis">
         <div class="analysis-card">
@@ -537,9 +588,9 @@ tr.year-start td{
       </div>
     </div>
 
+    <!-- 明細表 -->
     <div class="detail-header">
       <h4 id="detailTitle">還款明細表（僅顯示前8期與後8期，中間期數省略）</h4>
-      <button class="full-btn keep-print" id="toggleFullBtn" onclick="toggleFullList()">顯示全部期數</button>
     </div>
 
     <table>
