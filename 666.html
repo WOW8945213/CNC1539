@@ -477,7 +477,6 @@ tr.year-start td{
   .vt-toggle-row,
   .input-area,
   .btn-group,
-  .tip-wrap,
   button:not(.keep-print){
     display:none !important;
   }
@@ -495,7 +494,8 @@ tr.year-start td{
   .tab-bar,
   .tab-panel,
   .detail-header,
-  table{
+  table,
+  .tip-wrap{
     page-break-inside:avoid;
   }
 }
@@ -533,7 +533,7 @@ tr.year-start td{
 
     <div class="input-row">
       <label>年利率（%）</label>
-      <input type="number" step="0.01" id="rate" value="">
+      <input type="number" step="0.01" id="rate" value="3.3">
     </div>
 
     <div class="btn-group">
@@ -752,8 +752,18 @@ function renderResult(){
   document.getElementById('totalPayText').innerText = Math.round(d.P + d.totalInterest).toLocaleString() + ' 元';
   document.getElementById('totalIntText').innerText = Math.round(d.totalInterest).toLocaleString() + ' 元';
 
+  // 判斷綁約規則
+  let penaltyText = "";
+  if(d.year === 5 || d.year ===7){
+    penaltyText = "✅ 本方案分期"+d.year+"年，綁約2年；2年內結清違約金0.5-0.75％，滿2年後結清無違約金。";
+  }else if(d.year ===10){
+    penaltyText = "✅ 本方案分期10年，綁約3年；3年內結清違約金0.5-1％，滿3年後結清無違約金。";
+  }else{
+    penaltyText = "⚠️ 目前未設定該年期對應綁約規則，請另行確認違約金條款。";
+  }
+
   const totalPeriod = d.year * 12;
-  tipContent = '幫您試算的是貸款金額' + d.PWan.toLocaleString() + '萬，分期' + d.year + '年' + totalPeriod + '期，每月應繳金額' + monthPayRound.toLocaleString() + '元，您看一下月付金額您能不能負擔';
+  tipContent = '幫您試算的是貸款金額' + d.PWan.toLocaleString() + '萬，分期' + d.year + '年' + totalPeriod + '期，每月應繳金額' + monthPayRound.toLocaleString() + '元。\n' + penaltyText;
   document.getElementById('autoTip').innerText = tipContent;
 
   if(document.getElementById('rateText')){
@@ -830,19 +840,18 @@ function backToInput(){
   showAll = false;
   document.querySelector('.input-area').style.display = 'block';
   document.getElementById('resultBlock').style.display = 'none';
-  window.scrollTo(0, 0);
 }
 
 function clearAll(){
   document.getElementById('principal').value = '';
   document.getElementById('loanYear').value = '';
-  // 清除時重新帶回當前年月，不要清空
+  // 清除時重新帶回當前年月 + 年利率預設3.3
   const now = new Date();
   const yy = now.getFullYear() - 1911;
   const mm = now.getMonth() + 1;
   document.getElementById('rocYear').value = yy;
   document.getElementById('rocMonth').value = mm;
-  document.getElementById('rate').value = '';
+  document.getElementById('rate').value = "3.3";
   lastCalc = null;
   tipContent = '';
   showAll = false;
